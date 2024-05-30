@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Проект перенесен из Visual Studio.&#10;Код разбит на несколько файлов.&#10;Константы и переменные вынесены в отдельный файл">
-      <change afterPath="$PROJECT_DIR$/placement_algorithms_dynamic.py" afterDir="false" />
+    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Реализован прототип модульности через меню.&#10;Добавлено 2 режима, статический и динамический.&#10;В Статическом режиме реализовано добавления набора фигур. Изменения и удаления их из списка.&#10;Реализовано подсвечивание добавленных фигур.&#10;Динамический режим сохранен изначальным.">
+      <change afterPath="$PROJECT_DIR$/rectangle.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/placement_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement_algorithms_static.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placement_algorithms_static.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement_algorithms_static.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,7 +36,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Python.main.executor": "Run",
+    "Python.main.executor": "Debug",
     "Python.placement_algorithms_dynamic.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "ignore.virus.scanning.warn.message": "true"
@@ -66,11 +66,36 @@
       <option name="project" value="LOCAL" />
       <updated>1716984777506</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Реализован прототип модульности через меню.&#10;Добавлено 2 режима, статический и динамический.&#10;В Статическом режиме реализовано добавления набора фигур. Изменения и удаления их из списка.&#10;Реализовано подсвечивание добавленных фигур.&#10;Динамический режим сохранен изначальным.">
+      <option name="closed" value="true" />
+      <created>1717065882056</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1717065882056</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Проект перенесен из Visual Studio.&#10;Код разбит на несколько файлов.&#10;Константы и переменные вынесены в отдельный файл" />
-    <option name="LAST_COMMIT_MESSAGE" value="Проект перенесен из Visual Studio.&#10;Код разбит на несколько файлов.&#10;Константы и переменные вынесены в отдельный файл" />
+    <MESSAGE value="Реализован прототип модульности через меню.&#10;Добавлено 2 режима, статический и динамический.&#10;В Статическом режиме реализовано добавления набора фигур. Изменения и удаления их из списка.&#10;Реализовано подсвечивание добавленных фигур.&#10;Динамический режим сохранен изначальным." />
+    <option name="LAST_COMMIT_MESSAGE" value="Реализован прототип модульности через меню.&#10;Добавлено 2 режима, статический и динамический.&#10;В Статическом режиме реализовано добавления набора фигур. Изменения и удаления их из списка.&#10;Реализовано подсвечивание добавленных фигур.&#10;Динамический режим сохранен изначальным." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>153</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>281</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
