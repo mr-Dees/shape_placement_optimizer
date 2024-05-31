@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Представление прямоугольников изменилось с QRect на Собственный класс вынесенный в отдельный модуль.&#10;Изменен механизм добавления новых прямоугольников на два списка и два режима (пересчитать все или расположить как есть).&#10;Временно заглушен класс динамического размещения (возможен отказ от этого класса)">
+    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Функция удаления и изменения размещенных фигур приведена в рабочее состояние">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placement_algorithms_static.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement_algorithms_static.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rectangle.py" beforeDir="false" afterPath="$PROJECT_DIR$/rectangle.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +25,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "mr-Dees"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/mr-Dees/shape_placement_optimizer.git",
+    "accountId": "15b8e499-faa8-420d-ae74-b110e55ea3c9"
+  }
+}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 0
 }]]></component>
@@ -80,13 +94,22 @@
       <option name="project" value="LOCAL" />
       <updated>1717087280721</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Функция удаления и изменения размещенных фигур приведена в рабочее состояние">
+      <option name="closed" value="true" />
+      <created>1717088616102</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1717088616102</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Проект перенесен из Visual Studio.&#10;Код разбит на несколько файлов.&#10;Константы и переменные вынесены в отдельный файл" />
     <MESSAGE value="Реализован прототип модульности через меню.&#10;Добавлено 2 режима, статический и динамический.&#10;В Статическом режиме реализовано добавления набора фигур. Изменения и удаления их из списка.&#10;Реализовано подсвечивание добавленных фигур.&#10;Динамический режим сохранен изначальным." />
     <MESSAGE value="Представление прямоугольников изменилось с QRect на Собственный класс вынесенный в отдельный модуль.&#10;Изменен механизм добавления новых прямоугольников на два списка и два режима (пересчитать все или расположить как есть).&#10;Временно заглушен класс динамического размещения (возможен отказ от этого класса)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Представление прямоугольников изменилось с QRect на Собственный класс вынесенный в отдельный модуль.&#10;Изменен механизм добавления новых прямоугольников на два списка и два режима (пересчитать все или расположить как есть).&#10;Временно заглушен класс динамического размещения (возможен отказ от этого класса)" />
+    <MESSAGE value="Функция удаления и изменения размещенных фигур приведена в рабочее состояние" />
+    <option name="LAST_COMMIT_MESSAGE" value="Функция удаления и изменения размещенных фигур приведена в рабочее состояние" />
   </component>
 </project>

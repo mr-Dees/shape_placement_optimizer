@@ -1,5 +1,7 @@
 # placement_algorithms_static.py
 from rectangle import Rectangle
+import random
+from multiprocessing import Pool
 
 
 def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles):
