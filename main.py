@@ -4,56 +4,8 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout,
 from PyQt6.QtGui import QPainter, QPen, QPixmap, QAction
 from PyQt6.QtCore import Qt, QRect
 from constants import *
-import placement_algorithms_dynamic as pad
-import placement_algorithms_static as pas
+import placement_algorithms as pas
 from rectangle import Rectangle
-
-
-class MainMenu(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.init_ui()
-
-    def init_ui(self):
-        self.setWindowTitle("Главное меню")
-        self.setGeometry(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT)
-
-        self.menu_bar = self.menuBar()
-        self.mode_menu = self.menu_bar.addMenu("Режимы")
-
-        self.dynamic_action = QAction("Динамическое", self)
-        self.dynamic_action.triggered.connect(self.open_dynamic_mode)
-        self.mode_menu.addAction(self.dynamic_action)
-
-        self.static_action = QAction("Статическое", self)
-        self.static_action.triggered.connect(self.open_static_mode)
-        self.mode_menu.addAction(self.static_action)
-
-    def open_dynamic_mode(self):
-        self.dynamic_window = DynamicMode()
-        self.dynamic_window.show()
-
-    def open_static_mode(self):
-        self.static_window = StaticMode()
-        self.static_window.show()
-
-
-class DynamicMode(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.init_ui()
-
-    def init_ui(self):
-        self.setWindowTitle("Динамическое размещение")
-        self.setGeometry(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT)
-
-        layout = QVBoxLayout()
-        label = QLabel("Заглушка для динамического режима")
-        layout.addWidget(label)
-
-        central_widget = QWidget()
-        central_widget.setLayout(layout)
-        self.setCentralWidget(central_widget)
 
 
 class StaticMode(QMainWindow):
@@ -148,11 +100,17 @@ class StaticMode(QMainWindow):
         try:
             algorithm = self.algorithm_selector.currentText()
             if algorithm == BL_FILL:
-                new_rects = pas.bl_fill(self.canvas.width(), self.canvas.height(), [], self.new_rectangles + [Rectangle(rect.width, rect.height) for rect in self.rectangles])
+                new_rects = pas.bl_fill(self.canvas.width(), self.canvas.height(), [],
+                                        self.new_rectangles + [Rectangle(rect.width, rect.height) for rect in
+                                                               self.rectangles])
             elif algorithm == BEST_FIT:
-                new_rects = pas.best_fit(self.canvas.width(), self.canvas.height(), [], self.new_rectangles + [Rectangle(rect.width, rect.height) for rect in self.rectangles])
+                new_rects = pas.best_fit(self.canvas.width(), self.canvas.height(), [],
+                                         self.new_rectangles + [Rectangle(rect.width, rect.height) for rect in
+                                                                self.rectangles])
             elif algorithm == ANT_COLONY:
-                new_rects = pas.ant_colony_optimization(self.canvas.width(), self.canvas.height(), [], self.new_rectangles + [Rectangle(rect.width, rect.height) for rect in self.rectangles])
+                new_rects = pas.ant_colony_optimization(self.canvas.width(), self.canvas.height(), [],
+                                                        self.new_rectangles + [Rectangle(rect.width, rect.height) for
+                                                                               rect in self.rectangles])
             else:
                 raise ValueError("Неизвестный алгоритм")
 
@@ -299,10 +257,12 @@ class StaticMode(QMainWindow):
         new_height, ok2 = QInputDialog.getInt(self, "Изменить высоту", "Высота:", height, 1, 10000, 1)
 
         if ok1 and ok2:
-            algorithm, ok3 = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:", [BL_FILL, BEST_FIT, ANT_COLONY], 0, False)
+            algorithm, ok3 = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:", [BL_FILL, BEST_FIT, ANT_COLONY],
+                                                  0, False)
             if ok3:
                 confirm = QMessageBox.question(self, "Подтверждение изменений",
-                                               f"Изменить прямоугольник на {new_width}x{new_height} и пересчитать поле с использованием алгоритма {algorithm}?",
+                                               f"Изменить прямоугольник на {new_width}x{new_height} "
+                                               f"и пересчитать поле с использованием алгоритма {algorithm}?",
                                                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
                 if confirm == QMessageBox.StandardButton.Yes:
                     self.highlighted_rect.width = new_width
@@ -329,7 +289,8 @@ class StaticMode(QMainWindow):
             recalculate = QMessageBox.question(self, "Пересчитать поле", "Хотите пересчитать все поле?",
                                                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if recalculate == QMessageBox.StandardButton.Yes:
-                algorithm, ok = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:", [BL_FILL, BEST_FIT, ANT_COLONY], 0, False)
+                algorithm, ok = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:",
+                                                     [BL_FILL, BEST_FIT, ANT_COLONY], 0, False)
                 if ok:
                     self.recalculate_all()
             else:
@@ -339,7 +300,9 @@ class StaticMode(QMainWindow):
         rect_text = item.text()
         width, height = map(int, rect_text.split(":")[1].split("x"))
         rect_id = item.data(Qt.ItemDataRole.UserRole)
-        self.highlighted_rect = next((rect for rect in self.rectangles if rect.width == width and rect.height == height and rect.id == rect_id), None)
+        self.highlighted_rect = next(
+            (rect for rect in self.rectangles if rect.width == width and rect.height == height and rect.id == rect_id),
+            None)
         self.update_canvas()
 
     def edit_rectangle_from_list(self):
@@ -350,7 +313,9 @@ class StaticMode(QMainWindow):
         rect_text = current_item.text()
         width, height = map(int, rect_text.split(":")[1].split("x"))
         rect_id = current_item.data(Qt.ItemDataRole.UserRole)
-        rect_to_edit = next((rect for rect in self.rectangles if rect.width == width and rect.height == height and rect.id == rect_id), None)
+        rect_to_edit = next(
+            (rect for rect in self.rectangles if rect.width == width and rect.height == height and rect.id == rect_id),
+            None)
 
         if rect_to_edit is None:
             return
@@ -359,10 +324,12 @@ class StaticMode(QMainWindow):
         new_height, ok2 = QInputDialog.getInt(self, "Изменить высоту", "Высота:", height, 1, 10000, 1)
 
         if ok1 and ok2:
-            algorithm, ok3 = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:", [BL_FILL, BEST_FIT, ANT_COLONY], 0, False)
+            algorithm, ok3 = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:", [BL_FILL, BEST_FIT, ANT_COLONY],
+                                                  0, False)
             if ok3:
                 confirm = QMessageBox.question(self, "Подтверждение изменений",
-                                               f"Изменить прямоугольник на {new_width}x{new_height} и пересчитать поле с использованием алгоритма {algorithm}?",
+                                               f"Изменить прямоугольник на {new_width}x{new_height} "
+                                               f"и пересчитать поле с использованием алгоритма {algorithm}?",
                                                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
                 if confirm == QMessageBox.StandardButton.Yes:
                     rect_to_edit.width = new_width
@@ -379,7 +346,9 @@ class StaticMode(QMainWindow):
         rect_text = current_item.text()
         width, height = map(int, rect_text.split(":")[1].split("x"))
         rect_id = current_item.data(Qt.ItemDataRole.UserRole)
-        rect_to_delete = next((rect for rect in self.rectangles if rect.width == width and rect.height == height and rect.id == rect_id), None)
+        rect_to_delete = next(
+            (rect for rect in self.rectangles if rect.width == width and rect.height == height and rect.id == rect_id),
+            None)
 
         if rect_to_delete is None:
             return
@@ -397,7 +366,8 @@ class StaticMode(QMainWindow):
             recalculate = QMessageBox.question(self, "Пересчитать поле", "Хотите пересчитать все поле?",
                                                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if recalculate == QMessageBox.StandardButton.Yes:
-                algorithm, ok = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:", [BL_FILL, BEST_FIT, ANT_COLONY], 0, False)
+                algorithm, ok = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:",
+                                                     [BL_FILL, BEST_FIT, ANT_COLONY], 0, False)
                 if ok:
                     self.recalculate_all()
             else:
@@ -406,6 +376,6 @@ class StaticMode(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    main_menu = MainMenu()
-    main_menu.show()
+    static_mode = StaticMode()
+    static_mode.show()
     sys.exit(app.exec())

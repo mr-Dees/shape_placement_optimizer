@@ -1,6 +1,5 @@
-# placement_algorithms_static.py
+# placement_algorithms.py
 from rectangle import Rectangle
-import random
 from multiprocessing import Pool
 
 
