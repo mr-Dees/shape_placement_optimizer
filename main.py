@@ -299,6 +299,14 @@ class StaticMode(QMainWindow):
                     self.highlighted_rect = rect
                     self.show_context_menu(event.pos())
                     break
+        elif event.button() == Qt.MouseButton.LeftButton:
+            cursor_pos = event.pos()
+            for rect in self.placed_rectangles_list:
+                if QRect(rect.x, rect.y, rect.width, rect.height).contains(cursor_pos):
+                    self.highlighted_rect = rect
+                    self.select_rectangle_in_list(rect)
+                    break
+            self.update_canvas()
 
     def show_context_menu(self, position):
         if self.highlighted_rect is None:
@@ -434,6 +442,13 @@ class StaticMode(QMainWindow):
             None
         )
         self.update_canvas()
+
+    def select_rectangle_in_list(self, rect):
+        for index in range(self.placed_rectangles_list_widget.count()):
+            item = self.placed_rectangles_list_widget.item(index)
+            if item.data(Qt.ItemDataRole.UserRole) == rect.id:
+                self.placed_rectangles_list_widget.setCurrentItem(item)
+                break
 
     def edit_rectangle_from_list(self):
         current_item = self.placed_rectangles_list_widget.currentItem()
