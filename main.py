@@ -53,19 +53,23 @@ class StaticMode(QMainWindow):
         input_layout = QHBoxLayout()
         self.width_input = QLineEdit()
         self.height_input = QLineEdit()
+        self.quantity_input = QLineEdit()
+        self.quantity_input.setText("1")  # Устанавливаем значение по умолчанию
         self.width_input.setMinimumWidth(MINIMUM_WIDTH_ENTRY)
         self.height_input.setMinimumWidth(MINIMUM_WIDTH_ENTRY)
+        self.quantity_input.setMinimumWidth(MINIMUM_WIDTH_ENTRY)
         input_layout.addWidget(QLabel("Ширина:"))
         input_layout.addWidget(self.width_input)
         input_layout.addWidget(QLabel("Высота:"))
         input_layout.addWidget(self.height_input)
         control_elements_layout.addLayout(input_layout)
 
-        # Добавляем список с выбором функции размещения
-        self.algorithm_selector = QComboBox()
-        self.algorithm_selector.addItems([BL_FILL, BEST_FIT, ANT_COLONY])
-        control_elements_layout.addWidget(QLabel("Выбор алгоритма:"))
-        control_elements_layout.addWidget(self.algorithm_selector)
+        # Добавляем поле для ввода количества
+        quantity_layout = QHBoxLayout()
+        quantity_layout.addWidget(QLabel("Кол-во:  "))
+        quantity_layout.addWidget(self.quantity_input)
+        control_elements_layout.addLayout(quantity_layout)
+
         self.add_button = QPushButton("Добавить прямоугольник")
         self.add_button.clicked.connect(self.add_rectangle)
         control_elements_layout.addWidget(self.add_button)
@@ -76,19 +80,30 @@ class StaticMode(QMainWindow):
         control_elements_layout.addWidget(QLabel("Список прямоугольников для добавления:"))
         control_elements_layout.addWidget(self.new_rectangles_list_widget)
 
+        # Создаем горизонтальный макет для выбора алгоритма
+        algorithm_layout = QHBoxLayout()
+        algorithm_label = QLabel("Алгоритм:")
+        algorithm_layout.addWidget(algorithm_label)
+        self.algorithm_selector = QComboBox()
+        self.algorithm_selector.addItems([BL_FILL, BEST_FIT, ANT_COLONY])
+        algorithm_layout.addWidget(self.algorithm_selector)
+        algorithm_layout.setStretch(0, 1)
+        algorithm_layout.setStretch(1, 3)
+        control_elements_layout.addLayout(algorithm_layout)
+
         self.calculate_button = QPushButton("Рассчитать")
         self.calculate_button.clicked.connect(self.calculate_placement)
         control_elements_layout.addWidget(self.calculate_button)
 
         self.placed_rectangles_list_widget = QListWidget()
         self.placed_rectangles_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.placed_rectangles_list_widget.customContextMenuRequested.connect(
-            self.show_placed_rectangles_list_context_menu)
+        self.placed_rectangles_list_widget.customContextMenuRequested.connect(self.show_placed_rectangles_list_context_menu)
         self.placed_rectangles_list_widget.itemClicked.connect(self.highlight_rectangle_from_list)
         control_elements_layout.addWidget(QLabel("Текущие прямоугольники на холсте:"))
         control_elements_layout.addWidget(self.placed_rectangles_list_widget)
 
         content_layout.addLayout(control_elements_layout)
+
         self.canvas = QLabel()
         self.canvas.setStyleSheet(f"background-color: {CANVAS_BACKGROUND_COLOR};")
         self.canvas.setFixedSize(self.canvas_width, self.canvas_height)
@@ -96,8 +111,8 @@ class StaticMode(QMainWindow):
         self.canvas.mouseMoveEvent = self.on_mouse_move
         self.canvas.mousePressEvent = self.on_mouse_press
         content_layout.addWidget(self.canvas)
-        main_layout.addLayout(content_layout)
 
+        main_layout.addLayout(content_layout)
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
@@ -107,11 +122,20 @@ class StaticMode(QMainWindow):
         if width is None or height is None:
             return
 
-        new_rect = Rectangle(width, height)
-        self.new_rectangles_list.append(new_rect)
-        item = QListWidgetItem(f"Прямоугольник: {width}x{height}")
-        item.setData(Qt.ItemDataRole.UserRole, new_rect.id)
-        self.new_rectangles_list_widget.addItem(item)
+        try:
+            quantity = int(self.quantity_input.text().strip())
+            if quantity <= 0:
+                raise ValueError("Количество должно быть положительным числом.")
+        except ValueError as e:
+            QMessageBox.warning(self, "Ошибка", str(e))
+            return
+
+        for _ in range(quantity):
+            new_rect = Rectangle(width, height)
+            self.new_rectangles_list.append(new_rect)
+            item = QListWidgetItem(f"Прямоугольник: {width}x{height}")
+            item.setData(Qt.ItemDataRole.UserRole, new_rect.id)
+            self.new_rectangles_list_widget.addItem(item)
 
     def calculate_placement(self):
         if not self.new_rectangles_list:
