@@ -61,31 +61,34 @@ class StaticMode(QMainWindow):
         input_layout.addWidget(self.height_input)
         control_elements_layout.addLayout(input_layout)
 
+        # Добавляем список с выбором функции размещения
         self.algorithm_selector = QComboBox()
         self.algorithm_selector.addItems([BL_FILL, BEST_FIT, ANT_COLONY])
+        control_elements_layout.addWidget(QLabel("Выбор алгоритма:"))
+        control_elements_layout.addWidget(self.algorithm_selector)
+        self.add_button = QPushButton("Добавить прямоугольник")
+        self.add_button.clicked.connect(self.add_rectangle)
+        control_elements_layout.addWidget(self.add_button)
+
         self.new_rectangles_list_widget = QListWidget()
         self.new_rectangles_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.new_rectangles_list_widget.customContextMenuRequested.connect(self.show_new_rectangles_list_context_menu)
+        control_elements_layout.addWidget(QLabel("Список прямоугольников для добавления:"))
+        control_elements_layout.addWidget(self.new_rectangles_list_widget)
+
+        self.calculate_button = QPushButton("Рассчитать")
+        self.calculate_button.clicked.connect(self.calculate_placement)
+        control_elements_layout.addWidget(self.calculate_button)
+
         self.placed_rectangles_list_widget = QListWidget()
         self.placed_rectangles_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.placed_rectangles_list_widget.customContextMenuRequested.connect(
             self.show_placed_rectangles_list_context_menu)
         self.placed_rectangles_list_widget.itemClicked.connect(self.highlight_rectangle_from_list)
-
-        control_elements_layout.addWidget(QLabel("Список прямоугольников для добавления:"))
-        control_elements_layout.addWidget(self.new_rectangles_list_widget)
         control_elements_layout.addWidget(QLabel("Текущие прямоугольники на холсте:"))
         control_elements_layout.addWidget(self.placed_rectangles_list_widget)
 
-        self.add_button = QPushButton("Добавить прямоугольник")
-        self.add_button.clicked.connect(self.add_rectangle)
-        self.calculate_button = QPushButton("Рассчитать")
-        self.calculate_button.clicked.connect(self.calculate_placement)
-        control_elements_layout.addWidget(self.add_button)
-        control_elements_layout.addWidget(self.calculate_button)
-
         content_layout.addLayout(control_elements_layout)
-
         self.canvas = QLabel()
         self.canvas.setStyleSheet(f"background-color: {CANVAS_BACKGROUND_COLOR};")
         self.canvas.setFixedSize(self.canvas_width, self.canvas_height)
@@ -93,7 +96,6 @@ class StaticMode(QMainWindow):
         self.canvas.mouseMoveEvent = self.on_mouse_move
         self.canvas.mousePressEvent = self.on_mouse_press
         content_layout.addWidget(self.canvas)
-
         main_layout.addLayout(content_layout)
 
         central_widget = QWidget()
@@ -545,7 +547,9 @@ class StaticMode(QMainWindow):
         width, ok1 = QInputDialog.getInt(self, "Изменить размер холста", "Ширина:", self.canvas_width, 1, 10000, 1)
         height, ok2 = QInputDialog.getInt(self, "Изменить размер холста", "Высота:", self.canvas_height, 1, 10000, 1)
         if ok1 and ok2:
-            confirm = QMessageBox.question(self, "Подтверждение изменения размера", "Все размещения будут удалены. Вы уверены?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            confirm = QMessageBox.question(self, "Подтверждение изменения размера",
+                                           "Все размещения будут удалены. Вы уверены?",
+                                           QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if confirm == QMessageBox.StandardButton.Yes:
                 self.canvas_width = width
                 self.canvas_height = height
