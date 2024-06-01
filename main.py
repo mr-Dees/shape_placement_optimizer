@@ -97,7 +97,8 @@ class StaticMode(QMainWindow):
 
         self.placed_rectangles_list_widget = QListWidget()
         self.placed_rectangles_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.placed_rectangles_list_widget.customContextMenuRequested.connect(self.show_placed_rectangles_list_context_menu)
+        self.placed_rectangles_list_widget.customContextMenuRequested.connect(
+            self.show_placed_rectangles_list_context_menu)
         self.placed_rectangles_list_widget.itemClicked.connect(self.highlight_rectangle_from_list)
         control_elements_layout.addWidget(QLabel("Текущие прямоугольники на холсте:"))
         control_elements_layout.addWidget(self.placed_rectangles_list_widget)
@@ -292,15 +293,19 @@ class StaticMode(QMainWindow):
         self.update_canvas()
 
     def on_mouse_press(self, event):
+        cursor_pos = event.pos()
         if event.button() == Qt.MouseButton.RightButton:
-            cursor_pos = event.pos()
             for rect in self.placed_rectangles_list:
                 if QRect(rect.x, rect.y, rect.width, rect.height).contains(cursor_pos):
                     self.highlighted_rect = rect
+                    self.update_canvas()  # Обновляем холст для отображения выделения
                     self.show_context_menu(event.pos())
-                    break
+                    return  # Выходим из метода, если нашли и выделили прямоугольник
+            # Если не нашли прямоугольник под курсором, сбрасываем выделение и показываем меню
+            self.highlighted_rect = None
+            self.update_canvas()
+            self.show_context_menu(event.pos())
         elif event.button() == Qt.MouseButton.LeftButton:
-            cursor_pos = event.pos()
             for rect in self.placed_rectangles_list:
                 if QRect(rect.x, rect.y, rect.width, rect.height).contains(cursor_pos):
                     self.highlighted_rect = rect
@@ -309,9 +314,6 @@ class StaticMode(QMainWindow):
             self.update_canvas()
 
     def show_context_menu(self, position):
-        if self.highlighted_rect is None:
-            return
-
         global_pos = self.canvas.mapToGlobal(position)
         context_menu = QMenu(self)
         edit_action = QAction("Изменить", self)
