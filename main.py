@@ -101,6 +101,7 @@ class StaticMode(QMainWindow):
 
         self.placed_rectangles_list_widget = QListWidget()
         self.placed_rectangles_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.placed_rectangles_list_widget.itemClicked.connect(self.on_placed_rectangle_item_clicked)
         self.placed_rectangles_list_widget.customContextMenuRequested.connect(
             self.show_placed_rectangles_list_context_menu)
         control_elements_layout.addWidget(QLabel("Текущие прямоугольники на холсте:"))
@@ -321,6 +322,15 @@ class StaticMode(QMainWindow):
                     self.select_rectangle_in_list(rect)
                     break
             self.update_canvas()
+
+    def on_placed_rectangle_item_clicked(self, item):
+        rect_text = item.text()
+        width, height = map(int, rect_text.split(":")[1].split("x"))
+        rect_id = item.data(Qt.ItemDataRole.UserRole)
+        self.highlighted_rect = next(
+            (rect for rect in self.placed_rectangles_list if rect.width == width and rect.height == height and rect.id == rect_id),
+            None)
+        self.update_canvas()
 
     def show_context_menu(self, position):
         global_pos = self.canvas.mapToGlobal(position)
