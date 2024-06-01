@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Изменено использование слова &quot;холст&quot; на &quot;полотно&quot;.">
+    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Добавлено обнуление полей при добавлении прямоугольников в список.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placement_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement_algorithms.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,6 +49,7 @@
   "keyToString": {
     "Python.constants.executor": "Run",
     "Python.main.executor": "Run",
+    "Python.placement_algorithms.executor": "Run",
     "Python.placement_algorithms_dynamic.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "ignore.virus.scanning.warn.message": "true"
@@ -181,7 +183,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717250116032</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Добавлено обнуление полей при добавлении прямоугольников в список.">
+      <option name="closed" value="true" />
+      <created>1717250632719</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1717250632719</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -199,6 +209,7 @@
     <MESSAGE value="Добавлена обработка ЛКМ при нажатии на фигуру холста." />
     <MESSAGE value="Добавлена корректная обработка повторного нажатия ПКМ." />
     <MESSAGE value="Изменено использование слова &quot;холст&quot; на &quot;полотно&quot;." />
-    <option name="LAST_COMMIT_MESSAGE" value="Изменено использование слова &quot;холст&quot; на &quot;полотно&quot;." />
+    <MESSAGE value="Добавлено обнуление полей при добавлении прямоугольников в список." />
+    <option name="LAST_COMMIT_MESSAGE" value="Добавлено обнуление полей при добавлении прямоугольников в список." />
   </component>
 </project>

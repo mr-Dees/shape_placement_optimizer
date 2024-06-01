@@ -1,6 +1,6 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, \
-    QPushButton, QMessageBox, QComboBox, QMenu, QListWidget, QInputDialog, QListWidgetItem
+    QPushButton, QMessageBox, QComboBox, QMenu, QListWidget, QInputDialog, QListWidgetItem, QCheckBox
 from PyQt6.QtGui import QPainter, QPen, QPixmap, QAction
 from PyQt6.QtCore import QRect
 from constants import *
@@ -66,7 +66,7 @@ class StaticMode(QMainWindow):
 
         # Добавляем поле для ввода количества
         quantity_layout = QHBoxLayout()
-        quantity_layout.addWidget(QLabel("Кол-во:  "))
+        quantity_layout.addWidget(QLabel("Кол-во: "))
         quantity_layout.addWidget(self.quantity_input)
         control_elements_layout.addLayout(quantity_layout)
 
@@ -91,6 +91,10 @@ class StaticMode(QMainWindow):
         algorithm_layout.setStretch(1, 3)
         control_elements_layout.addLayout(algorithm_layout)
 
+        # Добавляем чекбокс для режима переворота
+        self.flip_checkbox = QCheckBox("Искать позицию с переворотом")
+        control_elements_layout.addWidget(self.flip_checkbox)
+
         self.calculate_button = QPushButton("Рассчитать")
         self.calculate_button.clicked.connect(self.calculate_placement)
         control_elements_layout.addWidget(self.calculate_button)
@@ -99,12 +103,10 @@ class StaticMode(QMainWindow):
         self.placed_rectangles_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.placed_rectangles_list_widget.customContextMenuRequested.connect(
             self.show_placed_rectangles_list_context_menu)
-        self.placed_rectangles_list_widget.itemClicked.connect(self.highlight_rectangle_from_list)
         control_elements_layout.addWidget(QLabel("Текущие прямоугольники на холсте:"))
         control_elements_layout.addWidget(self.placed_rectangles_list_widget)
 
         content_layout.addLayout(control_elements_layout)
-
         self.canvas = QLabel()
         self.canvas.setStyleSheet(f"background-color: {CANVAS_BACKGROUND_COLOR};")
         self.canvas.setFixedSize(self.canvas_width, self.canvas_height)
@@ -146,9 +148,19 @@ class StaticMode(QMainWindow):
             QMessageBox.warning(self, "Ошибка", "Нет новых прямоугольников для добавления.")
             return
 
+        if self.flip_checkbox.isChecked():
+            confirm = QMessageBox.question(
+                self, "Предупреждение",
+                "Из-за режима поиска позиции с переворотом, "
+                "длительность расчета может увеличиться до двух раз. Хотите продолжить?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+            if confirm == QMessageBox.StandardButton.No:
+                return
+
         confirm = QMessageBox.question(
-            self,
-            "Рассчитать размещение",
+            self, "Рассчитать размещение",
             "Нажмите Yes для перерасчета всех размещенных фигур\n"
             "Или No для дополнения уже размещенных.\n"
             "Добавление произойдет в соответствии с выбранным режимом",
@@ -160,7 +172,6 @@ class StaticMode(QMainWindow):
             self.recalculate_all()
         else:
             self.add_new_rectangles()
-
         self.update_placed_rectangles_list()
 
     def recalculate_all(self):
@@ -209,26 +220,22 @@ class StaticMode(QMainWindow):
     def add_new_rectangles(self):
         try:
             algorithm = self.algorithm_selector.currentText()
+            allow_flip = self.flip_checkbox.isChecked()
+
             if algorithm == BL_FILL:
                 new_rects = pas.bl_fill(
-                    self.canvas.width(),
-                    self.canvas.height(),
-                    self.placed_rectangles_list,
-                    self.new_rectangles_list
+                    self.canvas.width(), self.canvas.height(), self.placed_rectangles_list, self.new_rectangles_list,
+                    allow_flip
                 )
             elif algorithm == BEST_FIT:
                 new_rects = pas.best_fit(
-                    self.canvas.width(),
-                    self.canvas.height(),
-                    self.placed_rectangles_list,
-                    self.new_rectangles_list
+                    self.canvas.width(), self.canvas.height(), self.placed_rectangles_list, self.new_rectangles_list,
+                    allow_flip
                 )
             elif algorithm == ANT_COLONY:
                 new_rects = pas.ant_colony_optimization(
-                    self.canvas.width(),
-                    self.canvas.height(),
-                    self.placed_rectangles_list,
-                    self.new_rectangles_list
+                    self.canvas.width(), self.canvas.height(), self.placed_rectangles_list, self.new_rectangles_list,
+                    allow_flip=allow_flip
                 )
             else:
                 raise ValueError("Неизвестный алгоритм")
@@ -241,8 +248,7 @@ class StaticMode(QMainWindow):
                 self.update_placed_rectangles_list()
             else:
                 QMessageBox.warning(self, "Ошибка",
-                                    "Невозможно разместить прямоугольники размером {width}x{height}. "
-                                    "Недостаточно места на холсте.")
+                                    "Невозможно разместить прямоугольники размером {width}x{height}. Недостаточно места на холсте.")
         except Exception as e:
             QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при размещении прямоугольников: {str(e)}")
 
