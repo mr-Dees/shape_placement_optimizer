@@ -2,7 +2,7 @@ import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, \
     QPushButton, QMessageBox, QComboBox, QMenu, QListWidget, QInputDialog, QListWidgetItem
 from PyQt6.QtGui import QPainter, QPen, QPixmap, QAction
-from PyQt6.QtCore import Qt, QRect
+from PyQt6.QtCore import QRect
 from constants import *
 import placement_algorithms as pas
 from rectangle import Rectangle
@@ -41,6 +41,12 @@ class StaticMode(QMainWindow):
         self.calculate_button = QPushButton("Рассчитать")
         self.calculate_button.clicked.connect(self.calculate_placement)
 
+        self.recalculate_all_button = QPushButton("Пересчитать все поле")
+        self.recalculate_all_button.clicked.connect(self.recalculate_all_with_confirmation)
+
+        self.clear_all_button = QPushButton("Очистить все поле")
+        self.clear_all_button.clicked.connect(self.clear_all)
+
         self.new_rectangles_list_widget = QListWidget()
         self.new_rectangles_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.new_rectangles_list_widget.customContextMenuRequested.connect(self.show_new_rectangles_list_context_menu)
@@ -58,6 +64,8 @@ class StaticMode(QMainWindow):
         control_layout.addWidget(self.algorithm_selector)
         control_layout.addWidget(self.add_button)
         control_layout.addWidget(self.calculate_button)
+        control_layout.addWidget(self.recalculate_all_button)
+        control_layout.addWidget(self.clear_all_button)
         control_layout.addWidget(QLabel("Список прямоугольников для добавления:"))
         control_layout.addWidget(self.new_rectangles_list_widget)
         control_layout.addWidget(QLabel("Текущие прямоугольники на холсте:"))
@@ -334,7 +342,8 @@ class StaticMode(QMainWindow):
                 confirm = QMessageBox.question(
                     self,
                     "Подтверждение удаления",
-                    f"Вы действительно хотите удалить прямоугольник {width}x{height} с пересчетом всех размещенных фигур?",
+                    f"Вы действительно хотите удалить прямоугольник {width}x{height} "
+                    f"с пересчетом всех размещенных фигур?",
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
                 )
 
@@ -487,6 +496,28 @@ class StaticMode(QMainWindow):
                 index = self.placed_rectangles_list_widget.currentRow()
                 self.placed_rectangles_list_widget.takeItem(index)
                 self.update_canvas()
+
+    def clear_all(self):
+        confirm = QMessageBox.question(
+            self, "Подтверждение очистки",
+            "Вы действительно хотите очистить все поле?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        if confirm == QMessageBox.StandardButton.Yes:
+            self.placed_rectangles_list.clear()
+            self.new_rectangles_list.clear()
+            self.new_rectangles_list_widget.clear()
+            self.placed_rectangles_list_widget.clear()
+            self.update_canvas()
+
+    def recalculate_all_with_confirmation(self):
+        confirm = QMessageBox.question(
+            self, "Подтверждение пересчета",
+            "Вы действительно хотите пересчитать все поле?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        if confirm == QMessageBox.StandardButton.Yes:
+            self.recalculate_all()
 
 
 if __name__ == "__main__":
