@@ -18,8 +18,8 @@ class StaticMode(QMainWindow):
         self.highlighted_rect = None
 
     def get_canvas_dimensions(self):
-        width, ok1 = QInputDialog.getInt(self, "Размер холста", "Ширина:", 400, 1, 10000, 1)
-        height, ok2 = QInputDialog.getInt(self, "Размер холста", "Высота:", 400, 1, 10000, 1)
+        width, ok1 = QInputDialog.getInt(self, "Размер полотна", "Ширина:", 400, 1, 10000, 1)
+        height, ok2 = QInputDialog.getInt(self, "Размер полотна", "Высота:", 400, 1, 10000, 1)
         if ok1 and ok2:
             return width, height
         else:
@@ -36,7 +36,7 @@ class StaticMode(QMainWindow):
         self.recalculate_all_button.clicked.connect(self.recalculate_all_with_confirmation)
         self.clear_all_button = QPushButton("Очистить все поле")
         self.clear_all_button.clicked.connect(self.clear_all)
-        self.resize_canvas_button = QPushButton("Изменить размер холста")
+        self.resize_canvas_button = QPushButton("Изменить размер полотна")
         self.resize_canvas_button.clicked.connect(self.resize_canvas)
         buttons_layout.addWidget(self.recalculate_all_button)
         buttons_layout.addWidget(self.clear_all_button)
@@ -585,8 +585,8 @@ class StaticMode(QMainWindow):
             self.recalculate_all()
 
     def resize_canvas(self):
-        width, ok1 = QInputDialog.getInt(self, "Изменить размер холста", "Ширина:", self.canvas_width, 1, 10000, 1)
-        height, ok2 = QInputDialog.getInt(self, "Изменить размер холста", "Высота:", self.canvas_height, 1, 10000, 1)
+        width, ok1 = QInputDialog.getInt(self, "Изменить размер полотна", "Ширина:", self.canvas_width, 1, 10000, 1)
+        height, ok2 = QInputDialog.getInt(self, "Изменить размер полотна", "Высота:", self.canvas_height, 1, 10000, 1)
         if ok1 and ok2:
             confirm = QMessageBox.question(self, "Подтверждение изменения размера",
                                            "Все размещения будут удалены. Вы уверены?",

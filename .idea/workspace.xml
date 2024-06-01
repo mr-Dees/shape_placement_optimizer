@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Добавлена обработка ЛКМ при нажатии на фигуру холста.">
+    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Добавлена корректная обработка повторного нажатия ПКМ.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -165,7 +165,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717248141578</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Добавлена корректная обработка повторного нажатия ПКМ.">
+      <option name="closed" value="true" />
+      <created>1717249584587</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1717249584587</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -181,6 +189,7 @@
     <MESSAGE value="Исправлен баг с пропавшим меню выбора режима." />
     <MESSAGE value="Добавлено поле количество" />
     <MESSAGE value="Добавлена обработка ЛКМ при нажатии на фигуру холста." />
-    <option name="LAST_COMMIT_MESSAGE" value="Добавлена обработка ЛКМ при нажатии на фигуру холста." />
+    <MESSAGE value="Добавлена корректная обработка повторного нажатия ПКМ." />
+    <option name="LAST_COMMIT_MESSAGE" value="Добавлена корректная обработка повторного нажатия ПКМ." />
   </component>
 </project>
