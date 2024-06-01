@@ -122,7 +122,6 @@ class StaticMode(QMainWindow):
         width, height = self.get_input_dimensions()
         if width is None or height is None:
             return
-
         try:
             quantity = int(self.quantity_input.text().strip())
             if quantity <= 0:
@@ -130,13 +129,17 @@ class StaticMode(QMainWindow):
         except ValueError as e:
             QMessageBox.warning(self, "Ошибка", str(e))
             return
-
         for _ in range(quantity):
             new_rect = Rectangle(width, height)
             self.new_rectangles_list.append(new_rect)
             item = QListWidgetItem(f"Прямоугольник: {width}x{height}")
             item.setData(Qt.ItemDataRole.UserRole, new_rect.id)
             self.new_rectangles_list_widget.addItem(item)
+
+        # Сброс значений полей ввода
+        self.width_input.clear()
+        self.height_input.clear()
+        self.quantity_input.setText("1")
 
     def calculate_placement(self):
         if not self.new_rectangles_list:
