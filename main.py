@@ -11,71 +11,93 @@ from rectangle import Rectangle
 class StaticMode(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.canvas_width, self.canvas_height = self.get_canvas_dimensions()
         self.init_ui()
         self.new_rectangles_list = []
         self.placed_rectangles_list = []
         self.highlighted_rect = None
 
+    def get_canvas_dimensions(self):
+        width, ok1 = QInputDialog.getInt(self, "Размер холста", "Ширина:", 400, 1, 10000, 1)
+        height, ok2 = QInputDialog.getInt(self, "Размер холста", "Высота:", 400, 1, 10000, 1)
+        if ok1 and ok2:
+            return width, height
+        else:
+            sys.exit()
+
     def init_ui(self):
-        self.setWindowTitle("Статическое размещение")
-        self.setGeometry(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT)
+        self.setWindowTitle(WINDOW_TITLE)
+        self.setGeometry(WINDOW_X, WINDOW_Y, self.canvas_width, self.canvas_height)
+        main_layout = QVBoxLayout()
 
-        layout = QHBoxLayout()
-        control_layout = QVBoxLayout()
+        # Создаем горизонтальный макет для кнопок над холстом
+        buttons_layout = QHBoxLayout()
+        self.recalculate_all_button = QPushButton("Пересчитать все поле")
+        self.recalculate_all_button.clicked.connect(self.recalculate_all_with_confirmation)
+        self.clear_all_button = QPushButton("Очистить все поле")
+        self.clear_all_button.clicked.connect(self.clear_all)
+        self.resize_canvas_button = QPushButton("Изменить размер холста")
+        self.resize_canvas_button.clicked.connect(self.resize_canvas)
+        buttons_layout.addWidget(self.recalculate_all_button)
+        buttons_layout.addWidget(self.clear_all_button)
+        buttons_layout.addWidget(self.resize_canvas_button)
+        main_layout.addLayout(buttons_layout)
 
-        self.canvas = QLabel()
-        self.canvas.setStyleSheet(f"background-color: {CANVAS_BACKGROUND_COLOR};")
-        self.canvas.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
-        self.canvas.setMouseTracking(True)
-        self.canvas.mouseMoveEvent = self.on_mouse_move
-        self.canvas.mousePressEvent = self.on_mouse_press
+        # Создаем горизонтальный макет для основного содержимого
+        content_layout = QHBoxLayout()
 
+        # Создаем вертикальный макет для элементов управления
+        control_elements_layout = QVBoxLayout()
+
+        # Создаем горизонтальный макет для полей ввода
+        input_layout = QHBoxLayout()
         self.width_input = QLineEdit()
         self.height_input = QLineEdit()
-        self.add_button = QPushButton("Добавить прямоугольник")
-        self.add_button.clicked.connect(self.add_rectangle)
+        self.width_input.setMinimumWidth(MINIMUM_WIDTH_ENTRY)
+        self.height_input.setMinimumWidth(MINIMUM_WIDTH_ENTRY)
+        input_layout.addWidget(QLabel("Ширина:"))
+        input_layout.addWidget(self.width_input)
+        input_layout.addWidget(QLabel("Высота:"))
+        input_layout.addWidget(self.height_input)
+        control_elements_layout.addLayout(input_layout)
 
         self.algorithm_selector = QComboBox()
         self.algorithm_selector.addItems([BL_FILL, BEST_FIT, ANT_COLONY])
-
-        self.calculate_button = QPushButton("Рассчитать")
-        self.calculate_button.clicked.connect(self.calculate_placement)
-
-        self.recalculate_all_button = QPushButton("Пересчитать все поле")
-        self.recalculate_all_button.clicked.connect(self.recalculate_all_with_confirmation)
-
-        self.clear_all_button = QPushButton("Очистить все поле")
-        self.clear_all_button.clicked.connect(self.clear_all)
-
         self.new_rectangles_list_widget = QListWidget()
         self.new_rectangles_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.new_rectangles_list_widget.customContextMenuRequested.connect(self.show_new_rectangles_list_context_menu)
-
         self.placed_rectangles_list_widget = QListWidget()
         self.placed_rectangles_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.placed_rectangles_list_widget.customContextMenuRequested.connect(
             self.show_placed_rectangles_list_context_menu)
         self.placed_rectangles_list_widget.itemClicked.connect(self.highlight_rectangle_from_list)
 
-        control_layout.addWidget(QLabel("Ширина:"))
-        control_layout.addWidget(self.width_input)
-        control_layout.addWidget(QLabel("Высота:"))
-        control_layout.addWidget(self.height_input)
-        control_layout.addWidget(self.algorithm_selector)
-        control_layout.addWidget(self.add_button)
-        control_layout.addWidget(self.calculate_button)
-        control_layout.addWidget(self.recalculate_all_button)
-        control_layout.addWidget(self.clear_all_button)
-        control_layout.addWidget(QLabel("Список прямоугольников для добавления:"))
-        control_layout.addWidget(self.new_rectangles_list_widget)
-        control_layout.addWidget(QLabel("Текущие прямоугольники на холсте:"))
-        control_layout.addWidget(self.placed_rectangles_list_widget)
+        control_elements_layout.addWidget(QLabel("Список прямоугольников для добавления:"))
+        control_elements_layout.addWidget(self.new_rectangles_list_widget)
+        control_elements_layout.addWidget(QLabel("Текущие прямоугольники на холсте:"))
+        control_elements_layout.addWidget(self.placed_rectangles_list_widget)
 
-        layout.addLayout(control_layout)
-        layout.addWidget(self.canvas)
+        self.add_button = QPushButton("Добавить прямоугольник")
+        self.add_button.clicked.connect(self.add_rectangle)
+        self.calculate_button = QPushButton("Рассчитать")
+        self.calculate_button.clicked.connect(self.calculate_placement)
+        control_elements_layout.addWidget(self.add_button)
+        control_elements_layout.addWidget(self.calculate_button)
+
+        content_layout.addLayout(control_elements_layout)
+
+        self.canvas = QLabel()
+        self.canvas.setStyleSheet(f"background-color: {CANVAS_BACKGROUND_COLOR};")
+        self.canvas.setFixedSize(self.canvas_width, self.canvas_height)
+        self.canvas.setMouseTracking(True)
+        self.canvas.mouseMoveEvent = self.on_mouse_move
+        self.canvas.mousePressEvent = self.on_mouse_press
+        content_layout.addWidget(self.canvas)
+
+        main_layout.addLayout(content_layout)
 
         central_widget = QWidget()
-        central_widget.setLayout(layout)
+        central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
     def add_rectangle(self):
@@ -518,6 +540,22 @@ class StaticMode(QMainWindow):
         )
         if confirm == QMessageBox.StandardButton.Yes:
             self.recalculate_all()
+
+    def resize_canvas(self):
+        width, ok1 = QInputDialog.getInt(self, "Изменить размер холста", "Ширина:", self.canvas_width, 1, 10000, 1)
+        height, ok2 = QInputDialog.getInt(self, "Изменить размер холста", "Высота:", self.canvas_height, 1, 10000, 1)
+        if ok1 and ok2:
+            confirm = QMessageBox.question(self, "Подтверждение изменения размера", "Все размещения будут удалены. Вы уверены?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            if confirm == QMessageBox.StandardButton.Yes:
+                self.canvas_width = width
+                self.canvas_height = height
+                self.canvas.setFixedSize(self.canvas_width, self.canvas_height)
+                # Очистка поля
+                self.placed_rectangles_list.clear()
+                self.new_rectangles_list.clear()
+                self.new_rectangles_list_widget.clear()
+                self.placed_rectangles_list_widget.clear()
+                self.update_canvas()
 
 
 if __name__ == "__main__":

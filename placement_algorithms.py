@@ -1,4 +1,3 @@
-# placement_algorithms.py
 from rectangle import Rectangle
 from multiprocessing import Pool
 
