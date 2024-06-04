@@ -18,5 +18,6 @@ class Rectangle:
     def area(self):
         return self.width * self.height
 
-    def intersects(self, other):
-        return self.to_qrect().intersects(other.to_qrect())
+    def intersects(self, other, margin=0):
+        return QRect(self.x - margin, self.y - margin, self.width + 2 * margin, self.height + 2 * margin).intersects(
+            QRect(other.x - margin, other.y - margin, other.width + 2 * margin, other.height + 2 * margin))

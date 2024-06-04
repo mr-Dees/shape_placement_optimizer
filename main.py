@@ -95,6 +95,17 @@ class StaticMode(QMainWindow):
         self.flip_checkbox = QCheckBox("Искать позицию с переворотом")
         control_elements_layout.addWidget(self.flip_checkbox)
 
+        # Добавляем чекбокс и поле для ввода отступа
+        self.margin_checkbox = QCheckBox("Отступ")
+        self.margin_checkbox.stateChanged.connect(self.toggle_margin_input)
+        self.margin_input = QLineEdit()
+        self.margin_input.setText("5")
+        self.margin_input.setEnabled(False)
+        margin_layout = QHBoxLayout()
+        margin_layout.addWidget(self.margin_checkbox)
+        margin_layout.addWidget(self.margin_input)
+        control_elements_layout.addLayout(margin_layout)
+
         self.calculate_button = QPushButton("Рассчитать")
         self.calculate_button.clicked.connect(self.calculate_placement)
         control_elements_layout.addWidget(self.calculate_button)
@@ -120,6 +131,9 @@ class StaticMode(QMainWindow):
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
+
+    def toggle_margin_input(self, state):
+        self.margin_input.setEnabled(state == Qt.CheckState.Checked.value)
 
     def add_rectangle(self):
         width, height = self.get_input_dimensions()
@@ -178,13 +192,15 @@ class StaticMode(QMainWindow):
     def recalculate_all(self):
         try:
             algorithm = self.algorithm_selector.currentText()
+            margin = int(self.margin_input.text().strip()) if self.margin_checkbox.isChecked() else 0
             if algorithm == BL_FILL:
                 new_rects = pas.bl_fill(
                     self.canvas.width(),
                     self.canvas.height(),
                     [],
                     self.new_rectangles_list + [Rectangle(rect.width, rect.height) for rect in
-                                                self.placed_rectangles_list]
+                                                self.placed_rectangles_list],
+                    margin=margin
                 )
             elif algorithm == BEST_FIT:
                 new_rects = pas.best_fit(
@@ -192,7 +208,8 @@ class StaticMode(QMainWindow):
                     self.canvas.height(),
                     [],
                     self.new_rectangles_list + [Rectangle(rect.width, rect.height) for rect in
-                                                self.placed_rectangles_list]
+                                                self.placed_rectangles_list],
+                    margin=margin
                 )
             elif algorithm == ANT_COLONY:
                 new_rects = pas.ant_colony_optimization(
@@ -200,7 +217,8 @@ class StaticMode(QMainWindow):
                     self.canvas.height(),
                     [],
                     self.new_rectangles_list + [Rectangle(rect.width, rect.height) for rect in
-                                                self.placed_rectangles_list]
+                                                self.placed_rectangles_list],
+                    margin=margin
                 )
             else:
                 raise ValueError("Неизвестный алгоритм")
@@ -222,21 +240,23 @@ class StaticMode(QMainWindow):
         try:
             algorithm = self.algorithm_selector.currentText()
             allow_flip = self.flip_checkbox.isChecked()
+            margin = int(self.margin_input.text().strip()) if self.margin_checkbox.isChecked() else 0
 
             if algorithm == BL_FILL:
                 new_rects = pas.bl_fill(
                     self.canvas.width(), self.canvas.height(), self.placed_rectangles_list, self.new_rectangles_list,
-                    allow_flip
+                    allow_flip, margin
                 )
             elif algorithm == BEST_FIT:
                 new_rects = pas.best_fit(
                     self.canvas.width(), self.canvas.height(), self.placed_rectangles_list, self.new_rectangles_list,
-                    allow_flip
+                    allow_flip, margin
                 )
             elif algorithm == ANT_COLONY:
                 new_rects = pas.ant_colony_optimization(
                     self.canvas.width(), self.canvas.height(), self.placed_rectangles_list, self.new_rectangles_list,
-                    allow_flip=allow_flip
+                    num_ants=10, num_iterations=100, alpha=1.0, beta=2.0, evaporation_rate=0.5, pheromone_deposit=1.0,
+                    allow_flip=allow_flip, margin=margin
                 )
             else:
                 raise ValueError("Неизвестный алгоритм")
@@ -328,7 +348,8 @@ class StaticMode(QMainWindow):
         width, height = map(int, rect_text.split(":")[1].split("x"))
         rect_id = item.data(Qt.ItemDataRole.UserRole)
         self.highlighted_rect = next(
-            (rect for rect in self.placed_rectangles_list if rect.width == width and rect.height == height and rect.id == rect_id),
+            (rect for rect in self.placed_rectangles_list if
+             rect.width == width and rect.height == height and rect.id == rect_id),
             None)
         self.update_canvas()
 

@@ -2,28 +2,19 @@ from rectangle import Rectangle
 from multiprocessing import Pool
 
 
-def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=False):
+def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=False, margin=0):
     placed_rectangles = rectangles.copy()
     new_rectangles.sort(key=lambda r: r.area(), reverse=True)
 
     for rect in new_rectangles:
         best_rect = None
 
-        for y in range(canvas_height - 1, -1, -1):
-            for x in range(canvas_width):
-                # Проверка исходной фигуры
-                if x + rect.width <= canvas_width and y + rect.height <= canvas_height:
-                    candidate = Rectangle(rect.width, rect.height, x, y)
-                    if not any(candidate.intersects(r) for r in placed_rectangles):
-                        best_rect = candidate
-                        break
-
-                # Проверка перевернутой фигуры
-                if allow_flip and x + rect.height <= canvas_width and y + rect.width <= canvas_height:
-                    flipped_candidate = Rectangle(rect.height, rect.width, x, y)
-                    if not any(flipped_candidate.intersects(r) for r in placed_rectangles):
-                        best_rect = flipped_candidate
-                        break
+        for y in range(0, canvas_height - rect.height + 1):
+            for x in range(0, canvas_width - rect.width + 1):
+                candidate = Rectangle(rect.width, rect.height, x, y)
+                if not any(candidate.intersects(r, margin) for r in placed_rectangles):
+                    best_rect = candidate
+                    break
 
             if best_rect:
                 break
@@ -36,7 +27,7 @@ def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=
     return placed_rectangles
 
 
-def best_fit(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=False):
+def best_fit(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=False, margin=0):
     placed_rectangles = rectangles.copy()
     new_rectangles.sort(key=lambda r: r.area(), reverse=True)
 
@@ -44,24 +35,14 @@ def best_fit(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip
         best_rect = None
         best_area = float('inf')
 
-        for y in range(canvas_height - rect.height, -1, -1):
-            for x in range(canvas_width - rect.width + 1):
+        for y in range(0, canvas_height - rect.height + 1):
+            for x in range(0, canvas_width - rect.width + 1):
                 candidate = Rectangle(rect.width, rect.height, x, y)
-                if not any(candidate.intersects(r) for r in placed_rectangles):
+                if not any(candidate.intersects(r, margin) for r in placed_rectangles):
                     area = calculate_wasted_area(canvas_width, canvas_height, placed_rectangles, candidate)
                     if area < best_area:
                         best_rect = candidate
                         best_area = area
-
-        if allow_flip and best_rect is None:
-            for y in range(canvas_height - rect.width, -1, -1):
-                for x in range(canvas_width - rect.height + 1):
-                    candidate = Rectangle(rect.height, rect.width, x, y)
-                    if not any(candidate.intersects(r) for r in placed_rectangles):
-                        area = calculate_wasted_area(canvas_width, canvas_height, placed_rectangles, candidate)
-                        if area < best_area:
-                            best_rect = candidate
-                            best_area = area
 
         if best_rect:
             placed_rectangles.append(best_rect)
@@ -72,7 +53,8 @@ def best_fit(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip
 
 
 def ant_colony_optimization(canvas_width, canvas_height, rectangles, new_rectangles, num_ants=10, num_iterations=100,
-                            alpha=1.0, beta=2.0, evaporation_rate=0.5, pheromone_deposit=1.0, allow_flip=False):
+                            alpha=1.0, beta=2.0, evaporation_rate=0.5, pheromone_deposit=1.0, allow_flip=False,
+                            margin=0):
     pheromones = [[1.0 for _ in range(canvas_width)] for _ in range(canvas_height)]
     placed_rectangles = rectangles.copy()
     new_rectangles.sort(key=lambda r: r.area(), reverse=True)
@@ -84,14 +66,15 @@ def ant_colony_optimization(canvas_width, canvas_height, rectangles, new_rectang
         for iteration in range(num_iterations):
             with Pool(processes=num_ants) as pool:
                 results = pool.starmap(build_route, [
-                    (canvas_width, canvas_height, placed_rectangles, rect.width, rect.height, pheromones, alpha, beta)
+                    (canvas_width, canvas_height, placed_rectangles, rect.width, rect.height, pheromones, alpha, beta,
+                     margin)
                     for _ in range(num_ants)
                 ])
 
                 if allow_flip:
                     results += pool.starmap(build_route, [
                         (canvas_width, canvas_height, placed_rectangles, rect.height, rect.width, pheromones, alpha,
-                         beta)
+                         beta, margin)
                         for _ in range(num_ants)
                     ])
 
@@ -113,11 +96,11 @@ def ant_colony_optimization(canvas_width, canvas_height, rectangles, new_rectang
     return placed_rectangles
 
 
-def build_route(canvas_width, canvas_height, rectangles, width, height, pheromones, alpha, beta):
-    for y in range(canvas_height - height, -1, -1):
-        for x in range(canvas_width - width + 1):
+def build_route(canvas_width, canvas_height, rectangles, width, height, pheromones, alpha, beta, margin):
+    for y in range(0, canvas_height - height + 1):
+        for x in range(0, canvas_width - width + 1):
             candidate = Rectangle(width, height, x, y)
-            if not any(candidate.intersects(r) for r in rectangles):
+            if not any(candidate.intersects(r, margin) for r in rectangles):
                 return candidate
     return None
 

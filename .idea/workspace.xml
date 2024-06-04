@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Добавлена возможность переворота фигуры.&#10;Изменены функции размещения.&#10;Добавлен чекбокс.">
+    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Исправлен баг с подсвечиванием объектов через список добавленных объектов.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placement_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement_algorithms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rectangle.py" beforeDir="false" afterPath="$PROJECT_DIR$/rectangle.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,16 +46,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.constants.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.placement_algorithms.executor": "Run",
-    "Python.placement_algorithms_dynamic.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "ignore.virus.scanning.warn.message": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.constants.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.placement_algorithms.executor&quot;: &quot;Run&quot;,
+    &quot;Python.placement_algorithms_dynamic.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -198,7 +200,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717258921126</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Исправлен баг с подсвечиванием объектов через список добавленных объектов.">
+      <option name="closed" value="true" />
+      <created>1717259236887</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1717259236887</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -218,6 +228,7 @@
     <MESSAGE value="Изменено использование слова &quot;холст&quot; на &quot;полотно&quot;." />
     <MESSAGE value="Добавлено обнуление полей при добавлении прямоугольников в список." />
     <MESSAGE value="Добавлена возможность переворота фигуры.&#10;Изменены функции размещения.&#10;Добавлен чекбокс." />
-    <option name="LAST_COMMIT_MESSAGE" value="Добавлена возможность переворота фигуры.&#10;Изменены функции размещения.&#10;Добавлен чекбокс." />
+    <MESSAGE value="Исправлен баг с подсвечиванием объектов через список добавленных объектов." />
+    <option name="LAST_COMMIT_MESSAGE" value="Исправлен баг с подсвечиванием объектов через список добавленных объектов." />
   </component>
 </project>
