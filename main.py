@@ -298,10 +298,19 @@ class StaticMode(QMainWindow):
         painter = QPainter(pixmap)
         painter.setPen(QPen(PEN_COLOR, PEN_WIDTH))
 
+        margin = int(self.margin_input.text().strip()) if self.margin_checkbox.isChecked() else 0
+
         for rect in self.placed_rectangles_list:
             qrect = QRect(rect.x, rect.y, rect.width, rect.height)
             painter.setBrush(Qt.GlobalColor.yellow if rect == self.highlighted_rect else RECTANGLE_COLOR)
             painter.drawRect(qrect)
+
+            if margin > 0:
+                margin_rect = QRect(rect.x - margin, rect.y - margin, rect.width + 2 * margin, rect.height + 2 * margin)
+                painter.setPen(QPen(Qt.GlobalColor.lightGray, 1, Qt.PenStyle.SolidLine))
+                painter.setBrush(Qt.BrushStyle.NoBrush)
+                painter.drawRect(margin_rect)
+                painter.setPen(QPen(PEN_COLOR, PEN_WIDTH))
 
         painter.end()
         self.canvas.setPixmap(pixmap)
