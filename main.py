@@ -516,17 +516,6 @@ class StaticMode(QMainWindow):
                 self.update_canvas()
                 self.update_placed_rectangles_list()
 
-    def highlight_rectangle_from_list(self, item):
-        rect_text = item.text()
-        width, height = map(int, rect_text.split(":")[1].split("x"))
-        rect_id = item.data(Qt.ItemDataRole.UserRole)
-        self.highlighted_rect = next(
-            (rect for rect in self.placed_rectangles_list if
-             rect.width == width and rect.height == height and rect.id == rect_id),
-            None
-        )
-        self.update_canvas()
-
     def select_rectangle_in_list(self, rect):
         for index in range(self.placed_rectangles_list_widget.count()):
             item = self.placed_rectangles_list_widget.item(index)
