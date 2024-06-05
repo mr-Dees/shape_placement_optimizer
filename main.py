@@ -363,14 +363,20 @@ class StaticMode(QMainWindow):
         self.update_canvas()
 
     def show_context_menu(self, position):
+        # Если нет выделенного прямоугольника не вызываем контекстное меню
+        if self.highlighted_rect is None:
+            return
         global_pos = self.canvas.mapToGlobal(position)
         context_menu = QMenu(self)
+
         edit_action = QAction("Изменить", self)
-        delete_action = QAction("Удалить", self)
         edit_action.triggered.connect(self.edit_rectangle)
-        delete_action.triggered.connect(self.delete_rectangle)
         context_menu.addAction(edit_action)
+
+        delete_action = QAction("Удалить", self)
+        delete_action.triggered.connect(self.delete_rectangle)
         context_menu.addAction(delete_action)
+
         context_menu.exec(global_pos)
 
     def show_new_rectangles_list_context_menu(self, position):
