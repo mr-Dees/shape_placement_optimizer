@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout,
     QPushButton, QMessageBox, QComboBox, QMenu, QListWidget, QInputDialog, QListWidgetItem, QCheckBox
 from PyQt6.QtGui import QPainter, QPen, QPixmap, QAction
 from PyQt6.QtCore import QRect
-from constants import *
+from config import *
 import placement_algorithms as pas
 from rectangle import Rectangle
 
@@ -18,8 +18,8 @@ class StaticMode(QMainWindow):
         self.highlighted_rect = None
 
     def get_canvas_dimensions(self):
-        width, ok1 = QInputDialog.getInt(self, "Размер полотна", "Ширина:", 400, 1, 10000, 1)
-        height, ok2 = QInputDialog.getInt(self, "Размер полотна", "Высота:", 400, 1, 10000, 1)
+        width, ok1 = QInputDialog.getInt(self, "Размер полотна", "Ширина:", DEFAULT_CANVAS_WIDTH, 1, 10000, 1)
+        height, ok2 = QInputDialog.getInt(self, "Размер полотна", "Высота:", DEFAULT_CANVAS_HEIGHT, 1, 10000, 1)
         if ok1 and ok2:
             return width, height
         else:
@@ -120,7 +120,7 @@ class StaticMode(QMainWindow):
 
         content_layout.addLayout(control_elements_layout)
         self.canvas = QLabel()
-        self.canvas.setStyleSheet(f"background-color: {CANVAS_BACKGROUND_COLOR};")
+        self.canvas.setStyleSheet(f"background-color: white;")
         self.canvas.setFixedSize(self.canvas_width, self.canvas_height)
         self.canvas.setMouseTracking(True)
         self.canvas.mouseMoveEvent = self.on_mouse_move
@@ -294,23 +294,23 @@ class StaticMode(QMainWindow):
 
     def update_canvas(self):
         pixmap = QPixmap(self.canvas.size())
-        pixmap.fill(Qt.GlobalColor.white)
+        pixmap.fill(WHITE_COLOR)
         painter = QPainter(pixmap)
-        painter.setPen(QPen(PEN_COLOR, PEN_WIDTH))
+        painter.setPen(QPen(BLACK_COLOR, PEN_WIDTH))
 
         margin = int(self.margin_input.text().strip()) if self.margin_checkbox.isChecked() else 0
 
         for rect in self.placed_rectangles_list:
             qrect = QRect(rect.x, rect.y, rect.width, rect.height)
-            painter.setBrush(Qt.GlobalColor.yellow if rect == self.highlighted_rect else RECTANGLE_COLOR)
+            painter.setBrush(YELLOW_COLOR if rect == self.highlighted_rect else LIGHT_GRAY_COLOR)
             painter.drawRect(qrect)
 
             if margin > 0:
                 margin_rect = QRect(rect.x - margin, rect.y - margin, rect.width + 2 * margin, rect.height + 2 * margin)
-                painter.setPen(QPen(Qt.GlobalColor.lightGray, 1, Qt.PenStyle.SolidLine))
+                painter.setPen(QPen(LIGHT_GRAY_COLOR, 1, Qt.PenStyle.SolidLine))
                 painter.setBrush(Qt.BrushStyle.NoBrush)
                 painter.drawRect(margin_rect)
-                painter.setPen(QPen(PEN_COLOR, PEN_WIDTH))
+                painter.setPen(QPen(BLACK_COLOR, PEN_WIDTH))
 
         painter.end()
         self.canvas.setPixmap(pixmap)
