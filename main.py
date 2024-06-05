@@ -370,11 +370,11 @@ class StaticMode(QMainWindow):
         context_menu = QMenu(self)
 
         edit_action = QAction("Изменить", self)
-        edit_action.triggered.connect(self.edit_rectangle)
+        edit_action.triggered.connect(lambda: self.edit_rectangle(rect=None))
         context_menu.addAction(edit_action)
 
         delete_action = QAction("Удалить", self)
-        delete_action.triggered.connect(self.delete_rectangle)
+        delete_action.triggered.connect(lambda: self.delete_rectangle(rect=None))
         context_menu.addAction(delete_action)
 
         context_menu.exec(global_pos)
@@ -390,8 +390,8 @@ class StaticMode(QMainWindow):
         context_menu = QMenu(self)
         edit_action = QAction("Изменить", self)
         delete_action = QAction("Удалить", self)
-        edit_action.triggered.connect(self.edit_rectangle_from_list)
-        delete_action.triggered.connect(self.delete_rectangle_from_list)
+        edit_action.triggered.connect(self.edit_rectangle)
+        delete_action.triggered.connect(self.delete_rectangle)
         context_menu.addAction(edit_action)
         context_menu.addAction(delete_action)
         context_menu.exec(self.placed_rectangles_list_widget.mapToGlobal(position))
@@ -402,11 +402,25 @@ class StaticMode(QMainWindow):
             self.new_rectangles_list_widget.takeItem(current_row)
             del self.new_rectangles_list[current_row]
 
-    def edit_rectangle(self):
-        if self.highlighted_rect is None:
-            return
+    def edit_rectangle(self, rect=None):
+        if rect is None:
+            if self.highlighted_rect is None:
+                return
+            rect = self.highlighted_rect
+        else:
+            item = self.placed_rectangles_list_widget.currentItem()
+            if item is None:
+                return
+            rect_text = item.text()
+            width, height = map(int, rect_text.split(":")[1].split("x"))
+            rect_id = item.data(Qt.ItemDataRole.UserRole)
+            rect = next(
+                (r for r in self.placed_rectangles_list if r.width == width and r.height == height and r.id == rect_id),
+                None)
+            if rect is None:
+                return
 
-        width, height = self.highlighted_rect.width, self.highlighted_rect.height
+        width, height = rect.width, rect.height
         new_width, ok1 = QInputDialog.getInt(self, "Изменить ширину", "Ширина:", width, 1, 10000, 1)
         new_height, ok2 = QInputDialog.getInt(self, "Изменить высоту", "Высота:", height, 1, 10000, 1)
 
@@ -422,150 +436,30 @@ class StaticMode(QMainWindow):
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
                 )
                 if confirm == QMessageBox.StandardButton.Yes:
-                    self.highlighted_rect.width = new_width
-                    self.highlighted_rect.height = new_height
+                    rect.width = new_width
+                    rect.height = new_height
                     self.recalculate_all()
                     self.update_canvas()
 
-    def delete_rectangle(self):
-        if self.highlighted_rect is None:
-            return
+    def delete_rectangle(self, rect=None):
+        if rect is None:
+            if self.highlighted_rect is None:
+                return
+            rect = self.highlighted_rect
+        else:
+            item = self.placed_rectangles_list_widget.currentItem()
+            if item is None:
+                return
+            rect_text = item.text()
+            width, height = map(int, rect_text.split(":")[1].split("x"))
+            rect_id = item.data(Qt.ItemDataRole.UserRole)
+            rect = next(
+                (r for r in self.placed_rectangles_list if r.width == width and r.height == height and r.id == rect_id),
+                None)
+            if rect is None:
+                return
 
-        width, height = self.highlighted_rect.width, self.highlighted_rect.height
-
-        recalculate_choice = QMessageBox.question(
-            self,
-            "Выбор режима удаления",
-            "Нажмите Yes для удаления с перерасчетом всех размещенных фигур\n"
-            "Или No для удаления без перерасчета.",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            defaultButton=QMessageBox.StandardButton.Yes
-        )
-
-        if recalculate_choice == QMessageBox.StandardButton.Yes:
-            algorithm, ok = QInputDialog.getItem(
-                self,
-                "Выбор алгоритма",
-                "Алгоритм:",
-                [BL_FILL, BEST_FIT, ANT_COLONY],
-                0,
-                False
-            )
-            if ok:
-                confirm = QMessageBox.question(
-                    self,
-                    "Подтверждение удаления",
-                    f"Вы действительно хотите удалить прямоугольник {width}x{height} "
-                    f"с пересчетом всех размещенных фигур?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-                )
-
-                if confirm == QMessageBox.StandardButton.Yes:
-                    self.placed_rectangles_list.remove(self.highlighted_rect)
-                    if self.highlighted_rect in self.new_rectangles_list:
-                        self.new_rectangles_list.remove(self.highlighted_rect)
-                    index = self.placed_rectangles_list_widget.findItems(f"Прямоугольник: {width}x{height}",
-                                                                         Qt.MatchFlag.MatchExactly)
-                    if index:
-                        self.placed_rectangles_list_widget.takeItem(self.placed_rectangles_list_widget.row(index[0]))
-                    self.recalculate_all()
-
-        elif recalculate_choice == QMessageBox.StandardButton.No:
-            confirm = QMessageBox.question(
-                self,
-                "Подтверждение удаления",
-                f"Вы действительно хотите удалить прямоугольник {width}x{height} без пересчета всех размещенных фигур?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-            )
-
-            if confirm == QMessageBox.StandardButton.Yes:
-                self.placed_rectangles_list.remove(self.highlighted_rect)
-                if self.highlighted_rect in self.new_rectangles_list:
-                    self.new_rectangles_list.remove(self.highlighted_rect)
-                index = self.placed_rectangles_list_widget.findItems(f"Прямоугольник: {width}x{height}",
-                                                                     Qt.MatchFlag.MatchExactly)
-                if index:
-                    self.placed_rectangles_list_widget.takeItem(self.placed_rectangles_list_widget.row(index[0]))
-                self.update_canvas()
-                self.update_placed_rectangles_list()
-
-    def highlight_rectangle_from_list(self, item):
-        rect_text = item.text()
-        width, height = map(int, rect_text.split(":")[1].split("x"))
-        rect_id = item.data(Qt.ItemDataRole.UserRole)
-        self.highlighted_rect = next(
-            (rect for rect in self.placed_rectangles_list if
-             rect.width == width and rect.height == height and rect.id == rect_id),
-            None
-        )
-        self.update_canvas()
-
-    def select_rectangle_in_list(self, rect):
-        for index in range(self.placed_rectangles_list_widget.count()):
-            item = self.placed_rectangles_list_widget.item(index)
-            if item.data(Qt.ItemDataRole.UserRole) == rect.id:
-                self.placed_rectangles_list_widget.setCurrentItem(item)
-                break
-
-    def edit_rectangle_from_list(self):
-        current_item = self.placed_rectangles_list_widget.currentItem()
-        if current_item is None:
-            return
-
-        rect_text = current_item.text()
-        width, height = map(int, rect_text.split(":")[1].split("x"))
-        rect_id = current_item.data(Qt.ItemDataRole.UserRole)
-        rect_to_edit = next(
-            (rect for rect in self.placed_rectangles_list if
-             rect.width == width and rect.height == height and rect.id == rect_id),
-            None
-        )
-
-        if rect_to_edit is None:
-            return
-
-        new_width, ok1 = QInputDialog.getInt(self, "Изменить ширину", "Ширина:", width, 1, 10000, 1)
-        new_height, ok2 = QInputDialog.getInt(self, "Изменить высоту", "Высота:", height, 1, 10000, 1)
-
-        if ok1 and ok2:
-            algorithm, ok3 = QInputDialog.getItem(
-                self,
-                "Выбор алгоритма",
-                "Алгоритм:",
-                [BL_FILL, BEST_FIT, ANT_COLONY],
-                0,
-                False
-            )
-            if ok3:
-                confirm = QMessageBox.question(
-                    self,
-                    "Подтверждение изменений",
-                    f"Изменить прямоугольник на {new_width}x{new_height} "
-                    f"и пересчитать поле с использованием алгоритма {algorithm}?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-                )
-                if confirm == QMessageBox.StandardButton.Yes:
-                    rect_to_edit.width = new_width
-                    rect_to_edit.height = new_height
-                    self.recalculate_all()
-                    self.update_canvas()
-
-    def delete_rectangle_from_list(self):
-        current_item = self.placed_rectangles_list_widget.currentItem()
-        if current_item is None:
-            return
-
-        rect_text = current_item.text()
-        width, height = map(int, rect_text.split(":")[1].split("x"))
-        rect_id = current_item.data(Qt.ItemDataRole.UserRole)
-        rect_to_delete = next(
-            (rect for rect in self.placed_rectangles_list if
-             rect.width == width and rect.height == height and rect.id == rect_id),
-            None
-        )
-
-        if rect_to_delete is None:
-            return
+        width, height = rect.width, rect.height
 
         recalculate_choice = QMessageBox.question(
             self,
@@ -594,11 +488,13 @@ class StaticMode(QMainWindow):
                 )
 
                 if confirm == QMessageBox.StandardButton.Yes:
-                    self.placed_rectangles_list.remove(rect_to_delete)
-                    if rect_to_delete in self.new_rectangles_list:
-                        self.new_rectangles_list.remove(rect_to_delete)
-                    index = self.placed_rectangles_list_widget.currentRow()
-                    self.placed_rectangles_list_widget.takeItem(index)
+                    self.placed_rectangles_list.remove(rect)
+                    if rect in self.new_rectangles_list:
+                        self.new_rectangles_list.remove(rect)
+                    index = self.placed_rectangles_list_widget.findItems(f"Прямоугольник: {width}x{height}",
+                                                                         Qt.MatchFlag.MatchExactly)
+                    if index:
+                        self.placed_rectangles_list_widget.takeItem(self.placed_rectangles_list_widget.row(index[0]))
                     self.recalculate_all()
 
         elif recalculate_choice == QMessageBox.StandardButton.No:
@@ -610,12 +506,33 @@ class StaticMode(QMainWindow):
             )
 
             if confirm == QMessageBox.StandardButton.Yes:
-                self.placed_rectangles_list.remove(rect_to_delete)
-                if rect_to_delete in self.new_rectangles_list:
-                    self.new_rectangles_list.remove(rect_to_delete)
-                index = self.placed_rectangles_list_widget.currentRow()
-                self.placed_rectangles_list_widget.takeItem(index)
+                self.placed_rectangles_list.remove(rect)
+                if rect in self.new_rectangles_list:
+                    self.new_rectangles_list.remove(rect)
+                index = self.placed_rectangles_list_widget.findItems(f"Прямоугольник: {width}x{height}",
+                                                                     Qt.MatchFlag.MatchExactly)
+                if index:
+                    self.placed_rectangles_list_widget.takeItem(self.placed_rectangles_list_widget.row(index[0]))
                 self.update_canvas()
+                self.update_placed_rectangles_list()
+
+    def highlight_rectangle_from_list(self, item):
+        rect_text = item.text()
+        width, height = map(int, rect_text.split(":")[1].split("x"))
+        rect_id = item.data(Qt.ItemDataRole.UserRole)
+        self.highlighted_rect = next(
+            (rect for rect in self.placed_rectangles_list if
+             rect.width == width and rect.height == height and rect.id == rect_id),
+            None
+        )
+        self.update_canvas()
+
+    def select_rectangle_in_list(self, rect):
+        for index in range(self.placed_rectangles_list_widget.count()):
+            item = self.placed_rectangles_list_widget.item(index)
+            if item.data(Qt.ItemDataRole.UserRole) == rect.id:
+                self.placed_rectangles_list_widget.setCurrentItem(item)
+                break
 
     def clear_all(self):
         confirm = QMessageBox.question(
