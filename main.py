@@ -33,7 +33,8 @@ class StaticMode(QMainWindow):
         # Создаем горизонтальный макет для кнопок над холстом
         buttons_layout = QHBoxLayout()
         self.recalculate_all_button = QPushButton("Пересчитать все поле")
-        self.recalculate_all_button.clicked.connect(self.recalculate_all_with_confirmation)
+        self.recalculate_all_button.clicked.connect(
+            lambda: self.calculate_placement(recalculate_confirm=True, placement_mode=QMessageBox.StandardButton.Yes))
         self.clear_all_button = QPushButton("Очистить все поле")
         self.clear_all_button.clicked.connect(self.clear_all)
         self.resize_canvas_button = QPushButton("Изменить размер полотна")
@@ -107,7 +108,7 @@ class StaticMode(QMainWindow):
         control_elements_layout.addLayout(margin_layout)
 
         self.calculate_button = QPushButton("Рассчитать")
-        self.calculate_button.clicked.connect(self.calculate_placement)
+        self.calculate_button.clicked.connect(lambda: self.calculate_placement(placement_confirm=True))
         control_elements_layout.addWidget(self.calculate_button)
 
         self.placed_rectangles_list_widget = QListWidget()
@@ -158,106 +159,92 @@ class StaticMode(QMainWindow):
         self.height_input.clear()
         self.quantity_input.setText("1")
 
-    def calculate_placement(self):
-        if not self.new_rectangles_list:
-            QMessageBox.warning(self, "Ошибка", "Нет новых прямоугольников для добавления.")
-            return
+    def calculate_placement(self, recalculate_confirm=False, placement_confirm=False, placement_mode=None):
+        if recalculate_confirm:
+            confirm_dialog = QMessageBox.question(
+                self, "Подтверждение пересчета",
+                "Вы действительно хотите пересчитать все поле?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if confirm_dialog == QMessageBox.StandardButton.No:
+                return
 
-        if self.flip_checkbox.isChecked():
-            confirm = QMessageBox.question(
-                self, "Предупреждение",
-                "Из-за режима поиска позиции с переворотом, "
-                "длительность расчета может увеличиться до двух раз. Хотите продолжить?",
+        if placement_confirm:
+            if not self.new_rectangles_list:
+                QMessageBox.warning(self, "Ошибка", "Нет новых прямоугольников для добавления.")
+                return
+
+            if self.flip_checkbox.isChecked():
+                placement_mode = QMessageBox.question(
+                    self, "Предупреждение",
+                    "Из-за режима поиска позиции с переворотом, "
+                    "длительность расчета может увеличиться до двух раз. Хотите продолжить?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                    QMessageBox.StandardButton.No
+                )
+                if placement_mode == QMessageBox.StandardButton.No:
+                    return
+
+            placement_mode = QMessageBox.question(
+                self, "Рассчитать размещение",
+                "Нажмите Yes для перерасчета всех размещенных фигур\n"
+                "Или No для дополнения уже размещенных.\n"
+                "Добавление произойдет в соответствии с выбранным режимом",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No
             )
-            if confirm == QMessageBox.StandardButton.No:
-                return
 
-        confirm = QMessageBox.question(
-            self, "Рассчитать размещение",
-            "Нажмите Yes для перерасчета всех размещенных фигур\n"
-            "Или No для дополнения уже размещенных.\n"
-            "Добавление произойдет в соответствии с выбранным режимом",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No
-        )
-
-        if confirm == QMessageBox.StandardButton.Yes:
-            self.recalculate_all()
-        else:
-            self.add_new_rectangles()
-        self.update_placed_rectangles_list()
-
-    def recalculate_all(self):
-        try:
-            algorithm = self.algorithm_selector.currentText()
-            margin = int(self.margin_input.text().strip()) if self.margin_checkbox.isChecked() else 0
-            if algorithm == BL_FILL:
-                new_rects = pas.bl_fill(
-                    self.canvas.width(),
-                    self.canvas.height(),
-                    [],
-                    self.new_rectangles_list + [Rectangle(rect.width, rect.height) for rect in
-                                                self.placed_rectangles_list],
-                    margin=margin
-                )
-            elif algorithm == BEST_FIT:
-                new_rects = pas.best_fit(
-                    self.canvas.width(),
-                    self.canvas.height(),
-                    [],
-                    self.new_rectangles_list + [Rectangle(rect.width, rect.height) for rect in
-                                                self.placed_rectangles_list],
-                    margin=margin
-                )
-            elif algorithm == ANT_COLONY:
-                new_rects = pas.ant_colony_optimization(
-                    self.canvas.width(),
-                    self.canvas.height(),
-                    [],
-                    self.new_rectangles_list + [Rectangle(rect.width, rect.height) for rect in
-                                                self.placed_rectangles_list],
-                    margin=margin
-                )
-            else:
-                raise ValueError("Неизвестный алгоритм")
-
-            if new_rects:
-                self.placed_rectangles_list = new_rects
-                self.update_canvas()
-                self.new_rectangles_list.clear()
-                self.new_rectangles_list_widget.clear()
-                self.update_placed_rectangles_list()
-            else:
-                QMessageBox.warning(self, "Ошибка",
-                                    "Невозможно разместить прямоугольники размером {width}x{height}. "
-                                    "Недостаточно места на холсте.")
-        except Exception as e:
-            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при размещении прямоугольников: {str(e)}")
-
-    def add_new_rectangles(self):
         try:
             algorithm = self.algorithm_selector.currentText()
             allow_flip = self.flip_checkbox.isChecked()
             margin = int(self.margin_input.text().strip()) if self.margin_checkbox.isChecked() else 0
 
             if algorithm == BL_FILL:
-                new_rects = pas.bl_fill(
-                    self.canvas.width(), self.canvas.height(), self.placed_rectangles_list, self.new_rectangles_list,
-                    allow_flip, margin
-                )
+                if placement_mode == QMessageBox.StandardButton.Yes:
+                    new_rects = pas.bl_fill(
+                        self.canvas.width(), self.canvas.height(), [],
+                        self.new_rectangles_list + [Rectangle(rect.width, rect.height) for rect in
+                                                    self.placed_rectangles_list],
+                        allow_flip, margin
+                    )
+                else:
+                    new_rects = pas.bl_fill(
+                        self.canvas.width(), self.canvas.height(), self.placed_rectangles_list,
+                        self.new_rectangles_list,
+                        allow_flip, margin
+                    )
+
             elif algorithm == BEST_FIT:
-                new_rects = pas.best_fit(
-                    self.canvas.width(), self.canvas.height(), self.placed_rectangles_list, self.new_rectangles_list,
-                    allow_flip, margin
-                )
+                if placement_mode == QMessageBox.StandardButton.Yes:
+                    new_rects = pas.best_fit(
+                        self.canvas.width(), self.canvas.height(), [],
+                        self.new_rectangles_list + [Rectangle(rect.width, rect.height) for rect in
+                                                    self.placed_rectangles_list],
+                        allow_flip, margin
+                    )
+                else:
+                    new_rects = pas.best_fit(
+                        self.canvas.width(), self.canvas.height(), self.placed_rectangles_list,
+                        self.new_rectangles_list,
+                        allow_flip, margin
+                    )
+
             elif algorithm == ANT_COLONY:
-                new_rects = pas.ant_colony_optimization(
-                    self.canvas.width(), self.canvas.height(), self.placed_rectangles_list, self.new_rectangles_list,
-                    num_ants=10, num_iterations=100, alpha=1.0, beta=2.0, evaporation_rate=0.5, pheromone_deposit=1.0,
-                    allow_flip=allow_flip, margin=margin
-                )
+                if placement_mode == QMessageBox.StandardButton.Yes:
+                    new_rects = pas.ant_colony_optimization(
+                        self.canvas.width(), self.canvas.height(), [],
+                        self.new_rectangles_list + [Rectangle(rect.width, rect.height) for rect in
+                                                    self.placed_rectangles_list],
+                        allow_flip, margin
+                    )
+                else:
+                    new_rects = pas.ant_colony_optimization(
+                        self.canvas.width(), self.canvas.height(), self.placed_rectangles_list,
+                        self.new_rectangles_list,
+                        num_ants=10, num_iterations=100, alpha=1.0, beta=2.0, evaporation_rate=0.5,
+                        pheromone_deposit=1.0,
+                        allow_flip=allow_flip, margin=margin
+                    )
             else:
                 raise ValueError("Неизвестный алгоритм")
 
@@ -266,10 +253,10 @@ class StaticMode(QMainWindow):
                 self.update_canvas()
                 self.new_rectangles_list.clear()
                 self.new_rectangles_list_widget.clear()
-                self.update_placed_rectangles_list()
             else:
-                QMessageBox.warning(self, "Ошибка",
-                                    "Невозможно разместить прямоугольники размером {width}x{height}. Недостаточно места на холсте.")
+                QMessageBox.warning(self, "Ошибка", "Невозможно разместить прямоугольники размером {width}x{height}. "
+                                                    "Недостаточно места на холсте.")
+            self.update_placed_rectangles_list()
         except Exception as e:
             QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при размещении прямоугольников: {str(e)}")
 
@@ -438,7 +425,7 @@ class StaticMode(QMainWindow):
                 if confirm == QMessageBox.StandardButton.Yes:
                     rect.width = new_width
                     rect.height = new_height
-                    self.recalculate_all()
+                    self.calculate_placement(placement_mode=QMessageBox.StandardButton.Yes)
                     self.update_canvas()
 
     def delete_rectangle(self, rect=None):
@@ -495,7 +482,7 @@ class StaticMode(QMainWindow):
                                                                          Qt.MatchFlag.MatchExactly)
                     if index:
                         self.placed_rectangles_list_widget.takeItem(self.placed_rectangles_list_widget.row(index[0]))
-                    self.recalculate_all()
+                    self.calculate_placement(placement_mode=QMessageBox.StandardButton.Yes)
 
         elif recalculate_choice == QMessageBox.StandardButton.No:
             confirm = QMessageBox.question(
@@ -535,15 +522,6 @@ class StaticMode(QMainWindow):
             self.new_rectangles_list_widget.clear()
             self.placed_rectangles_list_widget.clear()
             self.update_canvas()
-
-    def recalculate_all_with_confirmation(self):
-        confirm = QMessageBox.question(
-            self, "Подтверждение пересчета",
-            "Вы действительно хотите пересчитать все поле?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
-        if confirm == QMessageBox.StandardButton.Yes:
-            self.recalculate_all()
 
     def resize_canvas(self):
         width, ok1 = QInputDialog.getInt(self, "Изменить размер полотна", "Ширина:", self.canvas_width, 1, 10000, 1)
