@@ -9,12 +9,21 @@ def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=
     for rect in new_rectangles:
         best_rect = None
 
-        for y in range(0, canvas_height - rect.height + 1):
-            for x in range(0, canvas_width - rect.width + 1):
-                candidate = Rectangle(rect.width, rect.height, x, y)
-                if not any(candidate.intersects(r, margin) for r in placed_rectangles):
-                    best_rect = candidate
-                    break
+        for y in range(canvas_height - 1, -1, -1):
+            for x in range(canvas_width - rect.height + 1):
+                # Проверка исходной фигуры
+                if x + rect.width <= canvas_width and y + rect.height <= canvas_height:
+                    candidate = Rectangle(rect.width, rect.height, x, y)
+                    if not any(candidate.intersects(r, margin) for r in placed_rectangles):
+                        best_rect = candidate
+                        break
+
+                # Проверка перевернутой фигуры
+                if allow_flip and x + rect.height <= canvas_width and y + rect.width <= canvas_height:
+                    flipped_candidate = Rectangle(rect.height, rect.width, x, y)
+                    if not any(flipped_candidate.intersects(r, margin) for r in placed_rectangles):
+                        best_rect = flipped_candidate
+                        break
 
             if best_rect:
                 break
@@ -35,14 +44,25 @@ def best_fit(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip
         best_rect = None
         best_area = float('inf')
 
-        for y in range(0, canvas_height - rect.height + 1):
-            for x in range(0, canvas_width - rect.width + 1):
-                candidate = Rectangle(rect.width, rect.height, x, y)
-                if not any(candidate.intersects(r, margin) for r in placed_rectangles):
-                    area = calculate_wasted_area(canvas_width, canvas_height, placed_rectangles, candidate)
-                    if area < best_area:
-                        best_rect = candidate
-                        best_area = area
+        for y in range(canvas_height - 1, -1, -1):
+            for x in range(canvas_width - rect.height + 1):
+                # Проверка исходной фигуры
+                if x + rect.width <= canvas_width and y + rect.height <= canvas_height:
+                    candidate = Rectangle(rect.width, rect.height, x, y)
+                    if not any(candidate.intersects(r, margin) for r in placed_rectangles):
+                        area = calculate_wasted_area(canvas_width, canvas_height, placed_rectangles, candidate)
+                        if area < best_area:
+                            best_rect = candidate
+                            best_area = area
+
+                # Проверка перевернутой фигуры
+                if allow_flip and x + rect.height <= canvas_width and y + rect.width <= canvas_height:
+                    flipped_candidate = Rectangle(rect.height, rect.width, x, y)
+                    if not any(flipped_candidate.intersects(r, margin) for r in placed_rectangles):
+                        area = calculate_wasted_area(canvas_width, canvas_height, placed_rectangles, flipped_candidate)
+                        if area < best_area:
+                            best_rect = flipped_candidate
+                            best_area = area
 
         if best_rect:
             placed_rectangles.append(best_rect)
@@ -64,29 +84,31 @@ def ant_colony_optimization(canvas_width, canvas_height, rectangles, new_rectang
         best_area = float('inf')
 
         for iteration in range(num_iterations):
-            with Pool(processes=num_ants) as pool:
-                results = pool.starmap(build_route, [
-                    (canvas_width, canvas_height, placed_rectangles, rect.width, rect.height, pheromones, alpha, beta,
-                     margin)
-                    for _ in range(num_ants)
-                ])
+            results = []
+            for y in range(canvas_height - 1, -1, -1):
+                for x in range(canvas_width):
+                    # Проверка исходной фигуры
+                    if x + rect.width <= canvas_width and y + rect.height <= canvas_height:
+                        candidate = Rectangle(rect.width, rect.height, x, y)
+                        if not any(candidate.intersects(r, margin) for r in placed_rectangles):
+                            results.append(candidate)
 
-                if allow_flip:
-                    results += pool.starmap(build_route, [
-                        (canvas_width, canvas_height, placed_rectangles, rect.height, rect.width, pheromones, alpha,
-                         beta, margin)
-                        for _ in range(num_ants)
-                    ])
+                    # Проверка перевернутой фигуры
+                    if allow_flip and x + rect.height <= canvas_width and y + rect.width <= canvas_height:
+                        flipped_candidate = Rectangle(rect.height, rect.width, x, y)
+                        if not any(flipped_candidate.intersects(r, margin) for r in placed_rectangles):
+                            results.append(flipped_candidate)
 
-                for candidate in results:
-                    if candidate:
-                        area = calculate_wasted_area(canvas_width, canvas_height, placed_rectangles, candidate)
-                        if area < best_area:
-                            best_rect = candidate
-                            best_area = area
+            for candidate in results:
+                if candidate:
+                    area = calculate_wasted_area(canvas_width, canvas_height, placed_rectangles, candidate)
+                    if area < best_area:
+                        best_rect = candidate
+                        best_area = area
 
-            update_pheromones(pheromones, candidate, pheromone_deposit)
-            evaporate_pheromones(pheromones, evaporation_rate)
+            if best_rect is not None:
+                update_pheromones(pheromones, best_rect, pheromone_deposit)
+                evaporate_pheromones(pheromones, evaporation_rate)
 
         if best_rect:
             placed_rectangles.append(best_rect)
@@ -96,18 +118,11 @@ def ant_colony_optimization(canvas_width, canvas_height, rectangles, new_rectang
     return placed_rectangles
 
 
-def build_route(canvas_width, canvas_height, rectangles, width, height, pheromones, alpha, beta, margin):
-    for y in range(0, canvas_height - height + 1):
-        for x in range(0, canvas_width - width + 1):
-            candidate = Rectangle(width, height, x, y)
-            if not any(candidate.intersects(r, margin) for r in rectangles):
-                return candidate
-    return None
-
-
 def update_pheromones(pheromones, rect, pheromone_deposit):
-    for y in range(rect.y, rect.y + rect.height):
-        for x in range(rect.x, rect.x + rect.width):
+    if rect is None:
+        return
+    for y in range(max(0, rect.y), min(len(pheromones), rect.y + rect.height)):
+        for x in range(max(0, rect.x), min(len(pheromones[y]), rect.x + rect.width)):
             pheromones[y][x] += pheromone_deposit
 
 

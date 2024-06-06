@@ -55,7 +55,7 @@ class StaticMode(QMainWindow):
         self.width_input = QLineEdit()
         self.height_input = QLineEdit()
         self.quantity_input = QLineEdit()
-        self.quantity_input.setText("1")  # Устанавливаем значение по умолчанию
+        self.quantity_input.setText("1")
         self.width_input.setMinimumWidth(MINIMUM_WIDTH_ENTRY)
         self.height_input.setMinimumWidth(MINIMUM_WIDTH_ENTRY)
         self.quantity_input.setMinimumWidth(MINIMUM_WIDTH_ENTRY)
@@ -288,12 +288,13 @@ class StaticMode(QMainWindow):
         margin = int(self.margin_input.text().strip()) if self.margin_checkbox.isChecked() else 0
 
         for rect in self.placed_rectangles_list:
-            qrect = QRect(rect.x, rect.y, rect.width, rect.height)
+            qrect = rect.to_qrect()
             painter.setBrush(YELLOW_COLOR if rect == self.highlighted_rect else LIGHT_GRAY_COLOR)
             painter.drawRect(qrect)
 
             if margin > 0:
-                margin_rect = QRect(rect.x - margin, rect.y - margin, rect.width + 2 * margin, rect.height + 2 * margin)
+                margin_rect = QRect(qrect.x() - margin, qrect.y() - margin, qrect.width() + 2 * margin,
+                                    qrect.height() + 2 * margin)
                 painter.setPen(QPen(LIGHT_GRAY_COLOR, 1, Qt.PenStyle.SolidLine))
                 painter.setBrush(Qt.BrushStyle.NoBrush)
                 painter.drawRect(margin_rect)
@@ -322,11 +323,12 @@ class StaticMode(QMainWindow):
         cursor_pos = event.pos()
         if event.button() == Qt.MouseButton.RightButton:
             for rect in self.placed_rectangles_list:
+                # Выходим из метода, если нашли и выделили прямоугольник
                 if QRect(rect.x, rect.y, rect.width, rect.height).contains(cursor_pos):
                     self.highlighted_rect = rect
-                    self.update_canvas()  # Обновляем холст для отображения выделения
+                    self.update_canvas()
                     self.show_context_menu(event.pos())
-                    return  # Выходим из метода, если нашли и выделили прямоугольник
+                    return
             # Если не нашли прямоугольник под курсором, сбрасываем выделение и показываем меню
             self.highlighted_rect = None
             self.update_canvas()
