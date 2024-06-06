@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Удален неиспользуемый метод highlight_rectangle_from_list.">
+    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Восстановлен ошибочно-удаленный функционал функции размещения.&#10;&#10;Расположение возвращено в левый нижний угол.&#10;Переворот фигуры снова работает.&#10;Работа с отступом корректно учитывается.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/placement_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement_algorithms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rectangle.py" beforeDir="false" afterPath="$PROJECT_DIR$/rectangle.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -263,7 +261,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717591586890</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Восстановлен ошибочно-удаленный функционал функции размещения.&#10;&#10;Расположение возвращено в левый нижний угол.&#10;Переворот фигуры снова работает.&#10;Работа с отступом корректно учитывается.">
+      <option name="closed" value="true" />
+      <created>1717688010829</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1717688010829</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -301,6 +307,7 @@
     <MESSAGE value="Добавлена проверка выделенного прямоугольника перед вызовом контекстного меню (show_context_menu)" />
     <MESSAGE value="Методы edit_rectangle и delete_rectangle унифицированы.&#10;Удалены edit_rectangle_from_list и delete_rectangle_from_list." />
     <MESSAGE value="Удален неиспользуемый метод highlight_rectangle_from_list." />
-    <option name="LAST_COMMIT_MESSAGE" value="Удален неиспользуемый метод highlight_rectangle_from_list." />
+    <MESSAGE value="Восстановлен ошибочно-удаленный функционал функции размещения.&#10;&#10;Расположение возвращено в левый нижний угол.&#10;Переворот фигуры снова работает.&#10;Работа с отступом корректно учитывается." />
+    <option name="LAST_COMMIT_MESSAGE" value="Восстановлен ошибочно-удаленный функционал функции размещения.&#10;&#10;Расположение возвращено в левый нижний угол.&#10;Переворот фигуры снова работает.&#10;Работа с отступом корректно учитывается." />
   </component>
 </project>

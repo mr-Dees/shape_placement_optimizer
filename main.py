@@ -145,7 +145,7 @@ class StaticMode(QMainWindow):
             if quantity <= 0:
                 raise ValueError("Количество должно быть положительным числом.")
         except ValueError as e:
-            QMessageBox.warning(self, "Ошибка", str(e))
+            QMessageBox.warning(self, "Ошибка ввода", f"Ошибка ввода количества: {str(e)}")
             return
         for _ in range(quantity):
             new_rect = Rectangle(width, height)
@@ -168,33 +168,31 @@ class StaticMode(QMainWindow):
             )
             if confirm_dialog == QMessageBox.StandardButton.No:
                 return
+        try:
+            if placement_confirm:
+                if not self.new_rectangles_list:
+                    raise ValueError("Нет новых прямоугольников для добавления.")
 
-        if placement_confirm:
-            if not self.new_rectangles_list:
-                QMessageBox.warning(self, "Ошибка", "Нет новых прямоугольников для добавления.")
-                return
+                if self.flip_checkbox.isChecked():
+                    placement_mode = QMessageBox.question(
+                        self, "Предупреждение",
+                        "Из-за режима поиска позиции с переворотом, "
+                        "длительность расчета может увеличиться до двух раз. Хотите продолжить?",
+                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                        QMessageBox.StandardButton.No
+                    )
+                    if placement_mode == QMessageBox.StandardButton.No:
+                        return
 
-            if self.flip_checkbox.isChecked():
                 placement_mode = QMessageBox.question(
-                    self, "Предупреждение",
-                    "Из-за режима поиска позиции с переворотом, "
-                    "длительность расчета может увеличиться до двух раз. Хотите продолжить?",
+                    self, "Рассчитать размещение",
+                    "Нажмите Yes для перерасчета всех размещенных фигур\n"
+                    "Или No для дополнения уже размещенных.\n"
+                    "Добавление произойдет в соответствии с выбранным режимом",
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                     QMessageBox.StandardButton.No
                 )
-                if placement_mode == QMessageBox.StandardButton.No:
-                    return
 
-            placement_mode = QMessageBox.question(
-                self, "Рассчитать размещение",
-                "Нажмите Yes для перерасчета всех размещенных фигур\n"
-                "Или No для дополнения уже размещенных.\n"
-                "Добавление произойдет в соответствии с выбранным режимом",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                QMessageBox.StandardButton.No
-            )
-
-        try:
             algorithm = self.algorithm_selector.currentText()
             allow_flip = self.flip_checkbox.isChecked()
             margin = int(self.margin_input.text().strip()) if self.margin_checkbox.isChecked() else 0
@@ -254,11 +252,12 @@ class StaticMode(QMainWindow):
                 self.new_rectangles_list.clear()
                 self.new_rectangles_list_widget.clear()
             else:
-                QMessageBox.warning(self, "Ошибка", "Невозможно разместить прямоугольники размером {width}x{height}. "
-                                                    "Недостаточно места на холсте.")
+                raise ValueError("Недостаточно места на холсте.")
             self.update_placed_rectangles_list()
+        except ValueError as e:
+            QMessageBox.warning(self, "Ошибка", f"Произошла ошибка при размещении прямоугольников: {str(e)}")
         except Exception as e:
-            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при размещении прямоугольников: {str(e)}")
+            QMessageBox.warning(self, "Неизвестная ошибка", f"Произошла неизвестная ошибка: {str(e)}")
 
     def get_input_dimensions(self):
         try:
@@ -276,7 +275,7 @@ class StaticMode(QMainWindow):
 
             return width, height
         except ValueError as e:
-            QMessageBox.warning(self, "Ошибка", str(e))
+            QMessageBox.warning(self, "Ошибка ввода", f"Произошла ошибка при вводе данных: {str(e)}")
             return None, None
 
     def update_canvas(self):
@@ -410,25 +409,28 @@ class StaticMode(QMainWindow):
                 return
 
         width, height = rect.width, rect.height
-        new_width, ok1 = QInputDialog.getInt(self, "Изменить ширину", "Ширина:", width, 1, 10000, 1)
-        new_height, ok2 = QInputDialog.getInt(self, "Изменить высоту", "Высота:", height, 1, 10000, 1)
+        try:
+            new_width, ok1 = QInputDialog.getInt(self, "Изменить ширину", "Ширина:", width, 1, 10000, 1)
+            new_height, ok2 = QInputDialog.getInt(self, "Изменить высоту", "Высота:", height, 1, 10000, 1)
 
-        if ok1 and ok2:
-            algorithm, ok3 = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:", [BL_FILL, BEST_FIT, ANT_COLONY],
-                                                  0, False)
-            if ok3:
-                confirm = QMessageBox.question(
-                    self,
-                    "Подтверждение изменений",
-                    f"Изменить прямоугольник на {new_width}x{new_height} "
-                    f"и пересчитать поле с использованием алгоритма {algorithm}?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-                )
-                if confirm == QMessageBox.StandardButton.Yes:
-                    rect.width = new_width
-                    rect.height = new_height
-                    self.calculate_placement(placement_mode=QMessageBox.StandardButton.Yes)
-                    self.update_canvas()
+            if ok1 and ok2:
+                algorithm, ok3 = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:", [BL_FILL, BEST_FIT, ANT_COLONY],
+                                                      0, False)
+                if ok3:
+                    confirm = QMessageBox.question(
+                        self,
+                        "Подтверждение изменений",
+                        f"Изменить прямоугольник на {new_width}x{new_height} "
+                        f"и пересчитать поле с использованием алгоритма {algorithm}?",
+                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                    )
+                    if confirm == QMessageBox.StandardButton.Yes:
+                        rect.width = new_width
+                        rect.height = new_height
+                        self.calculate_placement(placement_mode=QMessageBox.StandardButton.Yes)
+                        self.update_canvas()
+        except ValueError as e:
+            QMessageBox.warning(self, "Ошибка ввода", f"Произошла ошибка при вводе данных: {str(e)}")
 
     def delete_rectangle(self, rect=None):
         if rect is None:
@@ -526,22 +528,26 @@ class StaticMode(QMainWindow):
             self.update_canvas()
 
     def resize_canvas(self):
-        width, ok1 = QInputDialog.getInt(self, "Изменить размер полотна", "Ширина:", self.canvas_width, 1, 10000, 1)
-        height, ok2 = QInputDialog.getInt(self, "Изменить размер полотна", "Высота:", self.canvas_height, 1, 10000, 1)
-        if ok1 and ok2:
-            confirm = QMessageBox.question(self, "Подтверждение изменения размера",
-                                           "Все размещения будут удалены. Вы уверены?",
-                                           QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-            if confirm == QMessageBox.StandardButton.Yes:
-                self.canvas_width = width
-                self.canvas_height = height
-                self.canvas.setFixedSize(self.canvas_width, self.canvas_height)
-                # Очистка поля
-                self.placed_rectangles_list.clear()
-                self.new_rectangles_list.clear()
-                self.new_rectangles_list_widget.clear()
-                self.placed_rectangles_list_widget.clear()
-                self.update_canvas()
+        try:
+            width, ok1 = QInputDialog.getInt(self, "Изменить размер полотна", "Ширина:",
+                                             self.canvas_width, 1, 10000, 1)
+            height, ok2 = QInputDialog.getInt(self, "Изменить размер полотна", "Высота:",
+                                              self.canvas_height, 1, 10000, 1)
+            if ok1 and ok2:
+                confirm = QMessageBox.question(self, "Подтверждение изменения размера",
+                                               "Все размещения будут удалены. Вы уверены?",
+                                               QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+                if confirm == QMessageBox.StandardButton.Yes:
+                    self.canvas_width = width
+                    self.canvas_height = height
+                    self.canvas.setFixedSize(self.canvas_width, self.canvas_height)
+                    self.placed_rectangles_list.clear()
+                    self.new_rectangles_list.clear()
+                    self.new_rectangles_list_widget.clear()
+                    self.placed_rectangles_list_widget.clear()
+                    self.update_canvas()
+        except ValueError as e:
+            QMessageBox.warning(self, "Ошибка ввода", f"Произошла ошибка при вводе данных: {str(e)}")
 
 
 if __name__ == "__main__":
