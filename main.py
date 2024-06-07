@@ -87,6 +87,7 @@ class UIManager(QMainWindow):
         control_elements_layout.addLayout(algorithm_layout)
 
         self.flip_checkbox = QCheckBox("Искать позицию с переворотом")
+        self.flip_checkbox.stateChanged.connect(self.on_flip_checkbox_state_changed)
         control_elements_layout.addWidget(self.flip_checkbox)
 
         self.margin_checkbox = QCheckBox("Отступ")
@@ -125,6 +126,18 @@ class UIManager(QMainWindow):
 
     def toggle_margin_input(self, state):
         self.margin_input.setEnabled(state == Qt.CheckState.Checked.value)
+        if state == Qt.CheckState.Checked.value and len(self.rectangle_manager.placed_rectangles_list) > 1:
+            QMessageBox.information(self, "Внимание",
+                                    "На полотне уже находится несколько прямоугольников.\n"
+                                    "Обратите внимание, что для корректного отображения реза "
+                                    "может потребоваться пересчитать решение.")
+        margin = int(self.margin_input.text().strip()) if state == Qt.CheckState.Checked.value else 0
+        self.canvas.update_canvas(self.rectangle_manager.placed_rectangles_list, margin, self.canvas.highlighted_rect)
+
+    def on_flip_checkbox_state_changed(self, state):
+        if state == Qt.CheckState.Checked.value:
+            QMessageBox.information(self, "Предупреждение", "Из-за режима поиска позиции с переворотом, "
+                                                            "длительность расчета может увеличиться до двух раз.")
 
     def add_rectangle(self):
         width, height = self.get_input_dimensions()
@@ -152,16 +165,6 @@ class UIManager(QMainWindow):
             if placement_confirm:
                 if not self.rectangle_manager.new_rectangles_list:
                     raise ValueError("Нет новых прямоугольников для добавления.")
-
-                if self.flip_checkbox.isChecked():
-                    placement_mode = QMessageBox.question(self, "Предупреждение",
-                                                          "Из-за режима поиска позиции с переворотом, "
-                                                          "длительность расчета может увеличиться до двух раз. "
-                                                          "Хотите продолжить?",
-                                                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                                                          QMessageBox.StandardButton.No)
-                    if placement_mode == QMessageBox.StandardButton.No:
-                        return
 
                 placement_mode = QMessageBox.question(self, "Рассчитать размещение",
                                                       "Нажмите Yes для перерасчета всех размещенных фигур\n"

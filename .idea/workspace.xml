@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Проведен существенный рефакторинг всего проекта:&#10;Было добавлено 3 новых класса&#10; canvas отвечающих за отображение холста &#10; rectangle_manager отвечающий за функции прямоугольников&#10; algorithm_selector отвевающий за выбор алгоритма размещения">
+    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Добавлены новые обработки исключений.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/placement_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement_algorithms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rectangle.py" beforeDir="false" afterPath="$PROJECT_DIR$/rectangle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rectangle_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/rectangle_manager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,22 +45,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python tests.Python tests in unit_test.py.executor": "Run",
-    "Python.AlgorithmSelector.executor": "Run",
-    "Python.Canvas.executor": "Run",
-    "Python.RectangleManager.executor": "Run",
-    "Python.config.executor": "Run",
-    "Python.constants.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.placement_algorithms.executor": "Debug",
-    "Python.placement_algorithms_dynamic.executor": "Run",
-    "Python.rectangle.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "ignore.virus.scanning.warn.message": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python tests.Python tests in unit_test.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python.AlgorithmSelector.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Canvas.executor&quot;: &quot;Run&quot;,
+    &quot;Python.RectangleManager.executor&quot;: &quot;Run&quot;,
+    &quot;Python.config.executor&quot;: &quot;Run&quot;,
+    &quot;Python.constants.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.placement_algorithms.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.placement_algorithms_dynamic.executor&quot;: &quot;Run&quot;,
+    &quot;Python.rectangle.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -280,7 +277,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717741572014</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Добавлены новые обработки исключений.">
+      <option name="closed" value="true" />
+      <created>1717747727945</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1717747727945</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -295,7 +300,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Проект перенесен из Visual Studio.&#10;Код разбит на несколько файлов.&#10;Константы и переменные вынесены в отдельный файл" />
     <MESSAGE value="Реализован прототип модульности через меню.&#10;Добавлено 2 режима, статический и динамический.&#10;В Статическом режиме реализовано добавления набора фигур. Изменения и удаления их из списка.&#10;Реализовано подсвечивание добавленных фигур.&#10;Динамический режим сохранен изначальным." />
     <MESSAGE value="Представление прямоугольников изменилось с QRect на Собственный класс вынесенный в отдельный модуль.&#10;Изменен механизм добавления новых прямоугольников на два списка и два режима (пересчитать все или расположить как есть).&#10;Временно заглушен класс динамического размещения (возможен отказ от этого класса)" />
     <MESSAGE value="Функция удаления и изменения размещенных фигур приведена в рабочее состояние" />
@@ -320,6 +324,7 @@
     <MESSAGE value="Удален неиспользуемый метод highlight_rectangle_from_list." />
     <MESSAGE value="Восстановлен ошибочно-удаленный функционал функции размещения.&#10;&#10;Расположение возвращено в левый нижний угол.&#10;Переворот фигуры снова работает.&#10;Работа с отступом корректно учитывается." />
     <MESSAGE value="Проведен существенный рефакторинг всего проекта:&#10;Было добавлено 3 новых класса&#10; canvas отвечающих за отображение холста &#10; rectangle_manager отвечающий за функции прямоугольников&#10; algorithm_selector отвевающий за выбор алгоритма размещения" />
-    <option name="LAST_COMMIT_MESSAGE" value="Проведен существенный рефакторинг всего проекта:&#10;Было добавлено 3 новых класса&#10; canvas отвечающих за отображение холста &#10; rectangle_manager отвечающий за функции прямоугольников&#10; algorithm_selector отвевающий за выбор алгоритма размещения" />
+    <MESSAGE value="Добавлены новые обработки исключений." />
+    <option name="LAST_COMMIT_MESSAGE" value="Добавлены новые обработки исключений." />
   </component>
 </project>
