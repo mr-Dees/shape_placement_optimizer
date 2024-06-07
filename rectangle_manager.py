@@ -9,6 +9,9 @@ class RectangleManager:
         self.placed_rectangles_list = []
 
     def add_rectangle(self, width, height, quantity, list_widget):
+        if width <= 0 or height <= 0:
+            raise ValueError("Ширина и высота должны быть положительными числами")
+
         for _ in range(quantity):
             new_rect = Rectangle(width, height)
             self.new_rectangles_list.append(new_rect)
@@ -30,6 +33,9 @@ class RectangleManager:
             list_widget.addItem(item)
 
     def delete_rectangle(self, rect, list_widget):
+        if rect not in self.placed_rectangles_list:
+            raise ValueError(f"Прямоугольник {rect.width}x{rect.height} не найден в списке размещенных прямоугольников")
+
         self.placed_rectangles_list.remove(rect)
         index = list_widget.findItems(f"Прямоугольник: {rect.width}x{rect.height}", Qt.MatchFlag.MatchExactly)
         if index:

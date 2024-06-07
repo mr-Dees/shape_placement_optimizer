@@ -5,6 +5,9 @@ class Rectangle:
     _id_counter = 0
 
     def __init__(self, width, height, x=0, y=0, canvas_width=None, canvas_height=None):
+        if width <= 0 or height <= 0:
+            raise ValueError("Ширина и высота прямоугольника должны быть больше нуля")
+
         self.id = Rectangle._id_counter
         Rectangle._id_counter += 1
         self.width = width
@@ -23,14 +26,14 @@ class Rectangle:
     def area(self):
         return self.width * self.height
 
-    def intersects(self, other, margin=0):
-        if (self.canvas_width is None or self.canvas_height is None or other.canvas_width is None
-                or other.canvas_height is None):
-            return QRect(self.x - margin, self.y - margin, self.width + 2 * margin,
-                         self.height + 2 * margin).intersects(
-                QRect(other.x - margin, other.y - margin, other.width + 2 * margin, other.height + 2 * margin))
+    def _get_qrect(self, margin):
+        if self.canvas_width is None or self.canvas_height is None:
+            return QRect(self.x - margin, self.y - margin, self.width + 2 * margin, self.height + 2 * margin)
         else:
-            return QRect(self.x - margin, self.canvas_height - self.y - self.height - margin, self.width + 2 * margin,
-                         self.height + 2 * margin).intersects(
-                QRect(other.x - margin, other.canvas_height - other.y - other.height - margin, other.width + 2 * margin,
-                      other.height + 2 * margin))
+            return QRect(self.x - margin, self.canvas_height - self.y - self.height - margin,
+                         self.width + 2 * margin, self.height + 2 * margin)
+
+    def intersects(self, other, margin=0):
+        if not isinstance(other, Rectangle):
+            raise TypeError("Аргумент other должен быть экземпляром класса Rectangle")
+        return self._get_qrect(margin).intersects(other._get_qrect(margin))

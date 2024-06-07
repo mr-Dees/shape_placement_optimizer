@@ -1,6 +1,18 @@
 from rectangle import Rectangle
+import functools
 
 
+def catch_exceptions(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            raise RuntimeError(f"Произошло исключение в функции {func.__name__}: {str(e)}") from e
+    return wrapper
+
+
+@catch_exceptions
 def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=False, margin=0):
     placed_rectangles = rectangles.copy()
     new_rectangles.sort(key=lambda r: r.area(), reverse=True)
@@ -35,6 +47,7 @@ def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=
     return placed_rectangles
 
 
+@catch_exceptions
 def best_fit(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=False, margin=0):
     placed_rectangles = rectangles.copy()
     new_rectangles.sort(key=lambda r: r.area(), reverse=True)
@@ -71,6 +84,7 @@ def best_fit(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip
     return placed_rectangles
 
 
+@catch_exceptions
 def ant_colony_optimization(canvas_width, canvas_height, rectangles, new_rectangles, num_ants=10, num_iterations=100,
                             alpha=1.0, beta=2.0, evaporation_rate=0.5, pheromone_deposit=1.0, allow_flip=False,
                             margin=0):

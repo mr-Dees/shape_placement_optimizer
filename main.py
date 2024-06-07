@@ -134,13 +134,12 @@ class UIManager(QMainWindow):
             quantity = int(self.quantity_input.text().strip())
             if quantity <= 0:
                 raise ValueError("Количество должно быть положительным числом.")
+            self.rectangle_manager.add_rectangle(width, height, quantity, self.new_rectangles_list_widget)
+            self.width_input.clear()
+            self.height_input.clear()
+            self.quantity_input.setText("1")
         except ValueError as e:
             QMessageBox.warning(self, "Ошибка ввода", f"Ошибка ввода количества: {str(e)}")
-            return
-        self.rectangle_manager.add_rectangle(width, height, quantity, self.new_rectangles_list_widget)
-        self.width_input.clear()
-        self.height_input.clear()
-        self.quantity_input.setText("1")
 
     def calculate_placement(self, recalculate_confirm=False, placement_confirm=False, placement_mode=None):
         if recalculate_confirm:
@@ -197,6 +196,8 @@ class UIManager(QMainWindow):
             else:
                 raise ValueError("Недостаточно места на холсте.")
             self.rectangle_manager.update_placed_rectangles_list(self.placed_rectangles_list_widget)
+        except RuntimeError as e:
+            QMessageBox.warning(self, "Ошибка", f"Произошла ошибка в алгоритме размещения: {str(e)}")
         except ValueError as e:
             QMessageBox.warning(self, "Ошибка", f"Произошла ошибка при размещении прямоугольников: {str(e)}")
         except Exception as e:
