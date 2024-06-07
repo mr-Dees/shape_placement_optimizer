@@ -1,5 +1,4 @@
 from rectangle import Rectangle
-from multiprocessing import Pool
 
 
 def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=False, margin=0):
