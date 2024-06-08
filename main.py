@@ -32,15 +32,17 @@ class UIManager(QMainWindow):
         main_layout = QVBoxLayout()
 
         buttons_layout = QHBoxLayout()
-        self.recalculate_all_button = QPushButton("Пересчитать все поле")
+        self.clear_all_button = QPushButton("Очистить все")
+        self.clear_all_button.clicked.connect(self.clear_all)
+        buttons_layout.addWidget(self.clear_all_button)
+
+        self.recalculate_all_button = QPushButton("Пересчитать все полотно")
         self.recalculate_all_button.clicked.connect(
             lambda: self.calculate_placement(recalculate_confirm=True, placement_mode=QMessageBox.StandardButton.Yes))
-        self.clear_all_button = QPushButton("Очистить все поле")
-        self.clear_all_button.clicked.connect(self.clear_all)
+        buttons_layout.addWidget(self.recalculate_all_button)
+
         self.resize_canvas_button = QPushButton("Изменить размер полотна")
         self.resize_canvas_button.clicked.connect(self.resize_canvas)
-        buttons_layout.addWidget(self.recalculate_all_button)
-        buttons_layout.addWidget(self.clear_all_button)
         buttons_layout.addWidget(self.resize_canvas_button)
         main_layout.addLayout(buttons_layout)
 
@@ -73,7 +75,7 @@ class UIManager(QMainWindow):
         self.new_rectangles_list_widget = QListWidget()
         self.new_rectangles_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.new_rectangles_list_widget.customContextMenuRequested.connect(self.show_new_rectangles_list_context_menu)
-        control_elements_layout.addWidget(QLabel("Список прямоугольников для добавления:"))
+        control_elements_layout.addWidget(QLabel("Список прямоугольников для размещения:"))
         control_elements_layout.addWidget(self.new_rectangles_list_widget)
 
         algorithm_layout = QHBoxLayout()
@@ -100,7 +102,7 @@ class UIManager(QMainWindow):
         margin_layout.addWidget(self.margin_input)
         control_elements_layout.addLayout(margin_layout)
 
-        self.calculate_button = QPushButton("Рассчитать")
+        self.calculate_button = QPushButton("Разместить")
         self.calculate_button.clicked.connect(lambda: self.calculate_placement(placement_confirm=True))
         control_elements_layout.addWidget(self.calculate_button)
 
@@ -109,7 +111,7 @@ class UIManager(QMainWindow):
         self.placed_rectangles_list_widget.itemClicked.connect(self.on_placed_rectangle_item_clicked)
         self.placed_rectangles_list_widget.customContextMenuRequested.connect(
             self.show_placed_rectangles_list_context_menu)
-        control_elements_layout.addWidget(QLabel("Текущие прямоугольники на холсте:"))
+        control_elements_layout.addWidget(QLabel("Текущие прямоугольники на полотне:"))
         control_elements_layout.addWidget(self.placed_rectangles_list_widget)
 
         content_layout.addLayout(control_elements_layout)
@@ -270,7 +272,7 @@ class UIManager(QMainWindow):
             return None, None
 
     def clear_all(self):
-        confirm = QMessageBox.question(self, "Подтверждение очистки", "Вы действительно хотите очистить все поле?",
+        confirm = QMessageBox.question(self, "Подтверждение очистки", "Вы действительно хотите очистить все?",
                                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if confirm == QMessageBox.StandardButton.Yes:
             self.rectangle_manager.clear_all(self.new_rectangles_list_widget, self.placed_rectangles_list_widget)
@@ -283,7 +285,7 @@ class UIManager(QMainWindow):
                                               1)
             if ok1 and ok2:
                 confirm = QMessageBox.question(self, "Подтверждение изменения размера",
-                                               "Все размещения будут удалены. Вы уверены?",
+                                               "Все данные будут очищены. Вы уверены?",
                                                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
                 if confirm == QMessageBox.StandardButton.Yes:
                     self.canvas_width = width

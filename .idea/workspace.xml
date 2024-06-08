@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Добавлен вывод информационных сообщений на оба чекбокса.">
+    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Теперь при пересчете всего полотна алгоритм, рез и переворот запрашивается у пользователя">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -293,7 +293,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717774349214</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Теперь при пересчете всего полотна алгоритм, рез и переворот запрашивается у пользователя">
+      <option name="closed" value="true" />
+      <created>1717866037890</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1717866037890</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -308,7 +316,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Представление прямоугольников изменилось с QRect на Собственный класс вынесенный в отдельный модуль.&#10;Изменен механизм добавления новых прямоугольников на два списка и два режима (пересчитать все или расположить как есть).&#10;Временно заглушен класс динамического размещения (возможен отказ от этого класса)" />
     <MESSAGE value="Функция удаления и изменения размещенных фигур приведена в рабочее состояние" />
     <MESSAGE value="Настроена работа всех основных механизмов.&#10;Код разбит на более мелкие функции&#10;&#10;Размещенные фигуры:&#10;  - У фигур появился ID, чтобы однозначно сопоставлять список с холстом.&#10;  - Добавлено контекстное окно на удаление и изменение.&#10;  - Добавлено выделение соответствующей фигуры на холсте при нажатии ЛКМ&#10;  &#10;Добавляемые фигуры:&#10;  - Возвращено контекстное меню на удаление&#10;  - При добавлении добавлен выбор: &#10;    1 - пересчитать весь холст&#10;    2 - поиск нового места с учетом алгоритма" />
     <MESSAGE value="Произведен успешный рефакторинг.&#10;&#10;Удалено меню.&#10;Удален модуль отвечающий за расчет положения в динамическом режиме.&#10;Удалены фрагменты кода отвечавших за динамический режим.&#10;Код приближен к стандарту PEP8." />
@@ -333,6 +340,7 @@
     <MESSAGE value="Проведен существенный рефакторинг всего проекта:&#10;Было добавлено 3 новых класса&#10; canvas отвечающих за отображение холста &#10; rectangle_manager отвечающий за функции прямоугольников&#10; algorithm_selector отвевающий за выбор алгоритма размещения" />
     <MESSAGE value="Добавлены новые обработки исключений." />
     <MESSAGE value="Добавлен вывод информационных сообщений на оба чекбокса." />
-    <option name="LAST_COMMIT_MESSAGE" value="Добавлен вывод информационных сообщений на оба чекбокса." />
+    <MESSAGE value="Теперь при пересчете всего полотна алгоритм, рез и переворот запрашивается у пользователя" />
+    <option name="LAST_COMMIT_MESSAGE" value="Теперь при пересчете всего полотна алгоритм, рез и переворот запрашивается у пользователя" />
   </component>
 </project>
