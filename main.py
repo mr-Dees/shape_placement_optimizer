@@ -156,11 +156,55 @@ class UIManager(QMainWindow):
 
     def calculate_placement(self, recalculate_confirm=False, placement_confirm=False, placement_mode=None):
         if recalculate_confirm:
+            algorithm, ok1 = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:",
+                                                  [BL_FILL, BEST_FIT, ANT_COLONY], 0, False)
+            if not ok1:
+                return
+
+            allow_cut = QMessageBox.question(self, "Отступ на рез", "Необходим ли отступ на рез?",
+                                             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            allow_cut = allow_cut == QMessageBox.StandardButton.Yes
+            if allow_cut:
+                current_margin = int(self.margin_input.text().strip()) if self.margin_input.text().strip() else 5
+                margin, ok2 = QInputDialog.getInt(self, "Отступ на рез", "Введите значение отступа:", current_margin, 0,
+                                                  10000, 1)
+                if not ok2:
+                    return
+            else:
+                margin = int(self.margin_input.text().strip()) if self.margin_input.text().strip() else 0
+
+            allow_flip = QMessageBox.question(self, "Переворот фигуры", "Необходим ли поиск позиции с переворотом?",
+                                              QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            allow_flip = allow_flip == QMessageBox.StandardButton.Yes
+
             confirm_dialog = QMessageBox.question(self, "Подтверждение пересчета",
-                                                  "Вы действительно хотите пересчитать все поле?",
+                                                  f"Вы действительно хотите пересчитать все поле с помощью:\n"
+                                                  f"алгоритма {algorithm}\n"
+                                                  f"{'с отступом ' if allow_cut else 'без отступа'}"
+                                                  f"{margin if allow_cut else ''} на рез\n"
+                                                  f"и {'с функцией' if allow_flip else 'без функции'} переворота?",
                                                   QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if confirm_dialog == QMessageBox.StandardButton.No:
                 return
+
+            # Отключаем сигналы перед изменением состояния чекбоксов
+            self.algorithm_selector_widget.blockSignals(True)
+            self.margin_checkbox.blockSignals(True)
+            self.margin_input.blockSignals(True)
+            self.flip_checkbox.blockSignals(True)
+
+            self.algorithm_selector_widget.setCurrentText(algorithm)
+            self.margin_checkbox.setChecked(allow_cut)
+            self.margin_input.setEnabled(allow_cut)
+            self.margin_input.setText(str(margin))
+            self.flip_checkbox.setChecked(allow_flip)
+
+            # Включаем сигналы после изменения состояния чекбоксов
+            self.algorithm_selector_widget.blockSignals(False)
+            self.margin_checkbox.blockSignals(False)
+            self.margin_input.blockSignals(False)
+            self.flip_checkbox.blockSignals(False)
+
         try:
             if placement_confirm:
                 if not self.rectangle_manager.new_rectangles_list:
