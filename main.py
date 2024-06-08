@@ -158,6 +158,11 @@ class UIManager(QMainWindow):
 
     def calculate_placement(self, recalculate_confirm=False, placement_confirm=False, placement_mode=None):
         if recalculate_confirm:
+            if not self.rectangle_manager.placed_rectangles_list:
+                QMessageBox.information(self, "Нет размещенных фигур",
+                                        "В данный момент нет прямоугольников доступных для перерасчета их позиции.")
+                return
+
             algorithm, ok1 = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:",
                                                   [BL_FILL, BEST_FIT, ANT_COLONY], 0, False)
             if not ok1:
