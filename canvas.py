@@ -1,6 +1,7 @@
 from PyQt6.QtGui import QPixmap, QPainter, QPen
 from PyQt6.QtWidgets import QLabel
 from PyQt6.QtCore import QRect
+from rectangle import Rectangle
 from config import *
 
 
@@ -18,6 +19,9 @@ class Canvas(QLabel):
         painter.setPen(QPen(BLACK_COLOR, PEN_WIDTH))
 
         for rect in placed_rectangles_list:
+            if not isinstance(rect, Rectangle):
+                raise TypeError(f"Ожидался объект Rectangle, но получен {type(rect)}")
+
             qrect = rect.to_qrect()
             painter.setBrush(YELLOW_COLOR if rect == highlighted_rect else LIGHT_GRAY_COLOR)
             painter.drawRect(qrect)

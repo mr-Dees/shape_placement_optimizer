@@ -1,5 +1,6 @@
 from rectangle import Rectangle
 import functools
+import pulp
 
 
 def catch_exceptions(func):
@@ -9,6 +10,7 @@ def catch_exceptions(func):
             return func(*args, **kwargs)
         except Exception as e:
             raise RuntimeError(f"Произошло исключение в функции {func.__name__}: {str(e)}") from e
+
     return wrapper
 
 
@@ -149,3 +151,66 @@ def calculate_wasted_area(canvas_width, canvas_height, rectangles, rect):
     total_area = canvas_width * canvas_height
     used_area = sum([r.width * r.height for r in rectangles]) + rect.width * rect.height
     return total_area - used_area
+
+
+@catch_exceptions
+def solve_packing_problem(canvas_width, canvas_height, placed_rectangles, new_rectangles, allow_flip=False, margin=0):
+    # Создаем задачу линейного программирования
+    problem = pulp.LpProblem("PackingProblem", pulp.LpMinimize)
+
+    # Создаем переменные
+    x = pulp.LpVariable.dicts("x", range(len(new_rectangles)), 0, canvas_width, cat='Integer')
+    y = pulp.LpVariable.dicts("y", range(len(new_rectangles)), 0, canvas_height, cat='Integer')
+    r = pulp.LpVariable.dicts("r", range(len(new_rectangles)), 0, 1, cat='Binary')
+    l = pulp.LpVariable.dicts("l", [(i, j) for i in range(len(new_rectangles)) for j in range(len(new_rectangles))], 0, 1, cat='Binary')
+    b = pulp.LpVariable.dicts("b", [(i, j) for i in range(len(new_rectangles)) for j in range(len(new_rectangles))], 0, 1, cat='Binary')
+
+    B = sum(max(rect.width, rect.height) for rect in new_rectangles)  # Большое число
+
+    # Целевая функция: минимизация высоты полосы H_max и минимизация координат x
+    H_max = pulp.LpVariable("H_max", 0, canvas_height, cat='Integer')
+    problem += H_max + 0.001 * pulp.lpSum([x[i] for i in range(len(new_rectangles))]), "MinimizeStripHeightAndLeftmost"
+
+    # Ограничения на размещение прямоугольников внутри полосы
+    for i in range(len(new_rectangles)):
+        width_i, height_i = new_rectangles[i].width, new_rectangles[i].height
+
+        problem += x[i] + width_i * (1 - r[i]) + height_i * r[i] <= canvas_width
+        problem += y[i] + height_i * (1 - r[i]) + width_i * r[i] <= H_max
+
+        for j in range(i + 1, len(new_rectangles)):
+            width_j, height_j = new_rectangles[j].width, new_rectangles[j].height
+
+            problem += x[i] + width_i * (1 - r[i]) + height_i * r[i] <= x[j] + (1 - l[i, j]) * B
+            problem += x[j] + width_j * (1 - r[j]) + height_j * r[j] <= x[i] + (1 - l[j, i]) * B
+            problem += y[i] + height_i * (1 - r[i]) + width_i * r[i] <= y[j] + (1 - b[i, j]) * B
+            problem += y[j] + height_j * (1 - r[j]) + width_j * r[j] <= y[i] + (1 - b[j, i]) * B
+
+            problem += l[i, j] + l[j, i] + b[i, j] + b[j, i] >= 1
+
+    # Ограничение на неотрицательность H_max
+    problem += H_max >= 0
+
+    # Решаем задачу
+    solver = pulp.PULP_CBC_CMD(msg=False, timeLimit=60, gapRel=0.01)  # Ограничение времени и относительного зазора
+    problem.solve(solver)
+
+    # Проверка на успешное размещение всех фигур
+    if pulp.LpStatus[problem.status] != 'Optimal':
+        return None
+
+    # Возвращаем результаты
+    results = []
+    for i in range(len(new_rectangles)):
+        width = new_rectangles[i].width if not pulp.value(r[i]) else new_rectangles[i].height
+        height = new_rectangles[i].height if not pulp.value(r[i]) else new_rectangles[i].width
+        results.append(Rectangle(
+            width,
+            height,
+            int(pulp.value(x[i])),
+            canvas_height - int(pulp.value(y[i])) - height,  # Учитываем высоту фигуры
+            None,
+            None
+        ))
+
+    return results

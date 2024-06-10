@@ -25,3 +25,4 @@ DEFAULT_MARGIN = 5
 BL_FILL = "BL-Fill"
 BEST_FIT = "Best-Fit"
 ANT_COLONY = "Ant Colony"
+LINEAR_PROGRAMMING = "Linear Programming"

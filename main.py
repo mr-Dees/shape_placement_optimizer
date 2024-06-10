@@ -82,7 +82,7 @@ class UIManager(QMainWindow):
         algorithm_label = QLabel("Алгоритм:")
         algorithm_layout.addWidget(algorithm_label)
         self.algorithm_selector_widget = QComboBox()
-        self.algorithm_selector_widget.addItems([BL_FILL, BEST_FIT, ANT_COLONY])
+        self.algorithm_selector_widget.addItems([BL_FILL, BEST_FIT, ANT_COLONY, LINEAR_PROGRAMMING])
         algorithm_layout.addWidget(self.algorithm_selector_widget)
         algorithm_layout.setStretch(0, 1)
         algorithm_layout.setStretch(1, 3)
