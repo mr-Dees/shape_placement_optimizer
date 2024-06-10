@@ -83,6 +83,7 @@ class UIManager(QMainWindow):
         algorithm_layout.addWidget(algorithm_label)
         self.algorithm_selector_widget = QComboBox()
         self.algorithm_selector_widget.addItems([BL_FILL, BEST_FIT, ANT_COLONY, LINEAR_PROGRAMMING])
+        self.algorithm_selector_widget.currentTextChanged.connect(self.on_algorithm_changed)
         algorithm_layout.addWidget(self.algorithm_selector_widget)
         algorithm_layout.setStretch(0, 1)
         algorithm_layout.setStretch(1, 3)
@@ -141,6 +142,19 @@ class UIManager(QMainWindow):
             QMessageBox.information(self, "Предупреждение", "Из-за режима поиска позиции с переворотом, "
                                                             "длительность расчета может увеличиться до двух раз.")
 
+    def on_algorithm_changed(self, algorithm):
+        if algorithm == LINEAR_PROGRAMMING:
+            self.flip_checkbox.blockSignals(True)
+            self.flip_checkbox.setChecked(True)
+            self.flip_checkbox.setEnabled(False)
+            self.flip_checkbox.blockSignals(False)
+            QMessageBox.information(self, "Информация",
+                                    "Данный алгоритм всегда ищет решение с переворотом фигуры "
+                                    "и полностью пересчитывает размещение на полотне.\n"
+                                    "Пожалуйста, учтите это при добавлении фигур на полотно.")
+        else:
+            self.flip_checkbox.setEnabled(True)
+
     def add_rectangle(self):
         width, height = self.get_input_dimensions()
         if width is None or height is None:
@@ -156,6 +170,8 @@ class UIManager(QMainWindow):
         except ValueError as e:
             QMessageBox.warning(self, "Ошибка ввода", f"Ошибка ввода количества: {str(e)}")
 
+    # main.py
+
     def calculate_placement(self, recalculate_confirm=False, placement_confirm=False, placement_mode=None):
         if recalculate_confirm:
             if not self.rectangle_manager.placed_rectangles_list:
@@ -164,7 +180,7 @@ class UIManager(QMainWindow):
                 return
 
             algorithm, ok1 = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:",
-                                                  [BL_FILL, BEST_FIT, ANT_COLONY], 0, False)
+                                                  [BL_FILL, BEST_FIT, ANT_COLONY, LINEAR_PROGRAMMING], 0, False)
             if not ok1:
                 return
 
@@ -180,17 +196,26 @@ class UIManager(QMainWindow):
             else:
                 margin = int(self.margin_input.text().strip()) if self.margin_input.text().strip() else 0
 
-            allow_flip = QMessageBox.question(self, "Переворот фигуры", "Необходим ли поиск позиции с переворотом?",
-                                              QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-            allow_flip = allow_flip == QMessageBox.StandardButton.Yes
-
-            confirm_dialog = QMessageBox.question(self, "Подтверждение пересчета",
-                                                  f"Вы действительно хотите пересчитать все поле с помощью:\n"
-                                                  f"алгоритма {algorithm}\n"
-                                                  f"{'с отступом ' if allow_cut else 'без отступа'}"
-                                                  f"{margin if allow_cut else ''} на рез\n"
-                                                  f"и {'с функцией' if allow_flip else 'без функции'} переворота?",
+            if algorithm == LINEAR_PROGRAMMING:
+                confirm_dialog = QMessageBox.question(self, "Подтверждение пересчета",
+                                                      f"Вы действительно хотите пересчитать все поле с помощью:\n"
+                                                      f"алгоритма {algorithm}.\nУчтите, что данный алгоритм всегда "
+                                                      f"ищет решение с функцией переворота.\n"
+                                                      f"{'Отступ ' if allow_cut else 'без отступа'}"
+                                                      f"{margin if allow_cut else ''} на рез\n",
+                                                      QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            else:
+                allow_flip = QMessageBox.question(self, "Переворот фигуры", "Необходим ли поиск позиции с переворотом?",
                                                   QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+                allow_flip = allow_flip == QMessageBox.StandardButton.Yes
+
+                confirm_dialog = QMessageBox.question(self, "Подтверждение пересчета",
+                                                      f"Вы действительно хотите пересчитать все поле с помощью:\n"
+                                                      f"алгоритма {algorithm}.\n"
+                                                      f"{'с отступом ' if allow_cut else 'без отступа'}"
+                                                      f"{margin if allow_cut else ''} на рез\n"
+                                                      f"и {'с функцией' if allow_flip else 'без функции'} переворота?",
+                                                      QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if confirm_dialog == QMessageBox.StandardButton.No:
                 return
 
@@ -204,7 +229,8 @@ class UIManager(QMainWindow):
             self.margin_checkbox.setChecked(allow_cut)
             self.margin_input.setEnabled(allow_cut)
             self.margin_input.setText(str(margin))
-            self.flip_checkbox.setChecked(allow_flip)
+            self.flip_checkbox.setChecked(allow_flip if algorithm != LINEAR_PROGRAMMING else True)
+            self.flip_checkbox.setEnabled(algorithm != LINEAR_PROGRAMMING)
 
             # Включаем сигналы после изменения состояния чекбоксов
             self.algorithm_selector_widget.blockSignals(False)
@@ -217,12 +243,27 @@ class UIManager(QMainWindow):
                 if not self.rectangle_manager.new_rectangles_list:
                     raise ValueError("Нет новых прямоугольников для добавления.")
 
-                placement_mode = QMessageBox.question(self, "Рассчитать размещение",
-                                                      "Нажмите Yes для перерасчета всех размещенных фигур\n"
-                                                      "Или No для дополнения уже размещенных.\n"
-                                                      "Добавление произойдет в соответствии с выбранным режимом",
-                                                      QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                                                      QMessageBox.StandardButton.No)
+                algorithm = self.algorithm_selector_widget.currentText()
+                if algorithm == LINEAR_PROGRAMMING:
+                    placement_mode = QMessageBox.question(self, "Рассчитать размещение",
+                                                          f"Нажмите Yes для перерасчета всех размещенных фигур\n"
+                                                          f"или Cancel для отмены.\nРазмещение произойдет в "
+                                                          f"соответствии с алгоритмом Linear Programming",
+                                                          QMessageBox.StandardButton.Yes |
+                                                          QMessageBox.StandardButton.Cancel,
+                                                          QMessageBox.StandardButton.Cancel)
+                    if placement_mode == QMessageBox.StandardButton.Cancel:
+                        return
+                else:
+                    placement_mode = QMessageBox.question(self, "Рассчитать размещение",
+                                                          f"Нажмите Yes для перерасчета всех размещенных фигур\n"
+                                                          f"Или No для дополнения уже размещенных.\nРазмещение "
+                                                          f"произойдет в соответствии с алгоритмом {algorithm}",
+                                                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                                                          | QMessageBox.StandardButton.Cancel,
+                                                          QMessageBox.StandardButton.Cancel)
+                    if placement_mode == QMessageBox.StandardButton.Cancel:
+                        return
 
             algorithm = self.algorithm_selector_widget.currentText()
             allow_flip = self.flip_checkbox.isChecked()
