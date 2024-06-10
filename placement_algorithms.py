@@ -175,16 +175,18 @@ def solve_packing_problem(canvas_width, canvas_height, placed_rectangles, new_re
     for i in range(len(new_rectangles)):
         width_i, height_i = new_rectangles[i].width, new_rectangles[i].height
 
+        # Ограничения на размещение внутри холста без учета отступов от краев
         problem += x[i] + width_i * (1 - r[i]) + height_i * r[i] <= canvas_width
         problem += y[i] + height_i * (1 - r[i]) + width_i * r[i] <= H_max
 
         for j in range(i + 1, len(new_rectangles)):
             width_j, height_j = new_rectangles[j].width, new_rectangles[j].height
 
-            problem += x[i] + width_i * (1 - r[i]) + height_i * r[i] <= x[j] + (1 - l[i, j]) * B
-            problem += x[j] + width_j * (1 - r[j]) + height_j * r[j] <= x[i] + (1 - l[j, i]) * B
-            problem += y[i] + height_i * (1 - r[i]) + width_i * r[i] <= y[j] + (1 - b[i, j]) * B
-            problem += y[j] + height_j * (1 - r[j]) + width_j * r[j] <= y[i] + (1 - b[j, i]) * B
+            # Ограничения на размещение с учетом удвоенных отступов между фигурами
+            problem += x[i] + width_i * (1 - r[i]) + height_i * r[i] + 2 * margin <= x[j] + (1 - l[i, j]) * B
+            problem += x[j] + width_j * (1 - r[j]) + height_j * r[j] + 2 * margin <= x[i] + (1 - l[j, i]) * B
+            problem += y[i] + height_i * (1 - r[i]) + width_i * r[i] + 2 * margin <= y[j] + (1 - b[i, j]) * B
+            problem += y[j] + height_j * (1 - r[j]) + width_j * r[j] + 2 * margin <= y[i] + (1 - b[j, i]) * B
 
             problem += l[i, j] + l[j, i] + b[i, j] + b[j, i] >= 1
 
