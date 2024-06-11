@@ -6,7 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Первично адаптирован алгоритм линейного программирования">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/algorithm_selector.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithm_selector.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placement_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement_algorithms.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -319,7 +321,23 @@
       <option name="project" value="LOCAL" />
       <updated>1718019415486</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="Добавлен прогресс выполнения алгоритмов.">
+      <option name="closed" value="true" />
+      <created>1718130169768</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1718130169768</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Добавлен прогресс выполнения алгоритмов.">
+      <option name="closed" value="true" />
+      <created>1718130179428</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1718130179428</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -334,7 +352,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Произведен успешный рефакторинг.&#10;&#10;Удалено меню.&#10;Удален модуль отвечающий за расчет положения в динамическом режиме.&#10;Удалены фрагменты кода отвечавших за динамический режим.&#10;Код приближен к стандарту PEP8." />
     <MESSAGE value="Исправлены функции удаления.&#10;Теперь программа производит удаление объектов, только после финального подтверждения" />
     <MESSAGE value="Добавлены кнопки &quot;пересчитать&quot; и &quot;очистить&quot;." />
     <MESSAGE value="Изменен дизайн и добавлен выбор размера холста.&#10;Добавлена кнопка изменить размер холста.&#10;Изменен файл с константами." />
@@ -359,6 +376,7 @@
     <MESSAGE value="Теперь при пересчете всего полотна алгоритм, рез и переворот запрашивается у пользователя" />
     <MESSAGE value="Косметические изменения в оформлении" />
     <MESSAGE value="Первично адаптирован алгоритм линейного программирования" />
-    <option name="LAST_COMMIT_MESSAGE" value="Первично адаптирован алгоритм линейного программирования" />
+    <MESSAGE value="Добавлен прогресс выполнения алгоритмов." />
+    <option name="LAST_COMMIT_MESSAGE" value="Добавлен прогресс выполнения алгоритмов." />
   </component>
 </project>

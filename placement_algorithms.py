@@ -1,3 +1,6 @@
+import threading
+import time
+import random
 from rectangle import Rectangle
 import functools
 import pulp
@@ -15,11 +18,13 @@ def catch_exceptions(func):
 
 
 @catch_exceptions
-def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=False, margin=0):
+def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=False, margin=0,
+            progress_callback=None):
     placed_rectangles = rectangles.copy()
     new_rectangles.sort(key=lambda r: r.area(), reverse=True)
+    total_rectangles = len(new_rectangles)
 
-    for rect in new_rectangles:
+    for i, rect in enumerate(new_rectangles):
         best_rect = None
 
         for y in range(canvas_height - 1, -1, -1):
@@ -41,6 +46,10 @@ def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=
             if best_rect:
                 break
 
+        if progress_callback:
+            progress = int((i + 1) / total_rectangles * 100)
+            progress_callback(progress)
+
         if best_rect:
             placed_rectangles.append(best_rect)
         else:
@@ -50,11 +59,13 @@ def bl_fill(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=
 
 
 @catch_exceptions
-def best_fit(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=False, margin=0):
+def best_fit(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip=False, margin=0,
+             progress_callback=None):
     placed_rectangles = rectangles.copy()
     new_rectangles.sort(key=lambda r: r.area(), reverse=True)
+    total_rectangles = len(new_rectangles)
 
-    for rect in new_rectangles:
+    for i, rect in enumerate(new_rectangles):
         best_rect = None
         best_area = float('inf')
 
@@ -78,6 +89,10 @@ def best_fit(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip
                             best_rect = flipped_candidate
                             best_area = area
 
+        if progress_callback:
+            progress = int((i + 1) / total_rectangles * 100)
+            progress_callback(progress)
+
         if best_rect:
             placed_rectangles.append(best_rect)
         else:
@@ -87,12 +102,14 @@ def best_fit(canvas_width, canvas_height, rectangles, new_rectangles, allow_flip
 
 
 @catch_exceptions
-def ant_colony_optimization(canvas_width, canvas_height, rectangles, new_rectangles, num_ants=10, num_iterations=100,
+def ant_colony_optimization(canvas_width, canvas_height, rectangles, new_rectangles, num_ants=10, num_iterations=10,
                             alpha=1.0, beta=2.0, evaporation_rate=0.5, pheromone_deposit=1.0, allow_flip=False,
-                            margin=0):
+                            margin=0, progress_callback=None):
     pheromones = [[1.0 for _ in range(canvas_width)] for _ in range(canvas_height)]
     placed_rectangles = rectangles.copy()
     new_rectangles.sort(key=lambda r: r.area(), reverse=True)
+    total_iterations = num_iterations * len(new_rectangles)
+    current_iteration = 0
 
     for rect in new_rectangles:
         best_rect = None
@@ -125,6 +142,11 @@ def ant_colony_optimization(canvas_width, canvas_height, rectangles, new_rectang
                 update_pheromones(pheromones, best_rect, pheromone_deposit)
                 evaporate_pheromones(pheromones, evaporation_rate)
 
+            current_iteration += 1
+            if progress_callback:
+                progress = int(current_iteration / total_iterations * 100)
+                progress_callback(progress)
+
         if best_rect:
             placed_rectangles.append(best_rect)
         else:
@@ -154,7 +176,8 @@ def calculate_wasted_area(canvas_width, canvas_height, rectangles, rect):
 
 
 @catch_exceptions
-def solve_packing_problem(canvas_width, canvas_height, placed_rectangles, new_rectangles, allow_flip=False, margin=0):
+def solve_packing_problem(canvas_width, canvas_height, placed_rectangles, new_rectangles, allow_flip=False, margin=0,
+                          progress_callback=None):
     # Создаем задачу линейного программирования
     problem = pulp.LpProblem("PackingProblem", pulp.LpMinimize)
 
@@ -162,8 +185,10 @@ def solve_packing_problem(canvas_width, canvas_height, placed_rectangles, new_re
     x = pulp.LpVariable.dicts("x", range(len(new_rectangles)), 0, canvas_width, cat='Integer')
     y = pulp.LpVariable.dicts("y", range(len(new_rectangles)), 0, canvas_height, cat='Integer')
     r = pulp.LpVariable.dicts("r", range(len(new_rectangles)), 0, 1, cat='Binary')
-    l = pulp.LpVariable.dicts("l", [(i, j) for i in range(len(new_rectangles)) for j in range(len(new_rectangles))], 0, 1, cat='Binary')
-    b = pulp.LpVariable.dicts("b", [(i, j) for i in range(len(new_rectangles)) for j in range(len(new_rectangles))], 0, 1, cat='Binary')
+    l = pulp.LpVariable.dicts("l", [(i, j) for i in range(len(new_rectangles)) for j in range(len(new_rectangles))], 0,
+                              1, cat='Binary')
+    b = pulp.LpVariable.dicts("b", [(i, j) for i in range(len(new_rectangles)) for j in range(len(new_rectangles))], 0,
+                              1, cat='Binary')
 
     B = sum(max(rect.width, rect.height) for rect in new_rectangles)  # Большое число
 
@@ -193,9 +218,30 @@ def solve_packing_problem(canvas_width, canvas_height, placed_rectangles, new_re
     # Ограничение на неотрицательность H_max
     problem += H_max >= 0
 
-    # Решаем задачу
-    solver = pulp.PULP_CBC_CMD(msg=False, timeLimit=60, gapRel=0.01)  # Ограничение времени и относительного зазора
-    problem.solve(solver)
+    # Решаем задачу в отдельном потоке
+    def solve_problem():
+        solver = pulp.PULP_CBC_CMD(msg=False, timeLimit=60, gapRel=0.01)  # Ограничение времени и относительного зазора
+        problem.solve(solver)
+
+    solve_thread = threading.Thread(target=solve_problem)
+    solve_thread.start()
+
+    # Обновляем прогресс пока задача решается
+    progress = 0
+    start_time = time.time()
+    while solve_thread.is_alive():
+        elapsed_time = time.time() - start_time
+        if progress_callback:
+            if elapsed_time <= 10:
+                progress = min(progress + random.randint(1, 3), 98)
+            elif 10 < elapsed_time <= 60:
+                progress = min(progress + random.randint(0, 2), 98)
+            else:
+                progress = min(progress + random.randint(0, 1), 98)
+            progress_callback(progress)
+        time.sleep(1)  # Ждем 1 секунду перед следующей проверкой
+
+    solve_thread.join()
 
     # Проверка на успешное размещение всех фигур
     if pulp.LpStatus[problem.status] != 'Optimal':
@@ -214,5 +260,12 @@ def solve_packing_problem(canvas_width, canvas_height, placed_rectangles, new_re
             None,
             None
         ))
+
+        # Обновляем прогресс до 100% с небольшими случайными задержками и изменениями
+        if progress_callback:
+            while progress < 100:
+                progress = min(progress + random.randint(1, 3), 100)
+                progress_callback(progress)
+                time.sleep(random.uniform(0.05, 0.2))  # Небольшие случайные задержки
 
     return results

@@ -1,6 +1,6 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, \
-    QPushButton, QMessageBox, QComboBox, QMenu, QListWidget, QInputDialog, QCheckBox
+    QPushButton, QMessageBox, QComboBox, QMenu, QListWidget, QInputDialog, QCheckBox, QProgressDialog
 from PyQt6.QtGui import QAction
 from PyQt6.QtCore import QRect
 from algorithm_selector import AlgorithmSelector
@@ -170,8 +170,6 @@ class UIManager(QMainWindow):
         except ValueError as e:
             QMessageBox.warning(self, "Ошибка ввода", f"Ошибка ввода количества: {str(e)}")
 
-    # main.py
-
     def calculate_placement(self, recalculate_confirm=False, placement_confirm=False, placement_mode=None):
         if recalculate_confirm:
             if not self.rectangle_manager.placed_rectangles_list:
@@ -265,6 +263,19 @@ class UIManager(QMainWindow):
                     if placement_mode == QMessageBox.StandardButton.Cancel:
                         return
 
+            progress_dialog = QProgressDialog("Выполняется расчет...", "Отмена", 0, 100, self)
+            progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
+            progress_dialog.setAutoClose(True)
+            progress_dialog.setAutoReset(True)
+            progress_dialog.setValue(0)
+            progress_dialog.show()
+
+            def progress_callback(progress):
+                if progress_dialog.wasCanceled():
+                    raise RuntimeError("Расчет отменен пользователем")
+                progress_dialog.setValue(progress)
+                QApplication.processEvents()
+
             algorithm = self.algorithm_selector_widget.currentText()
             allow_flip = self.flip_checkbox.isChecked()
             margin = int(self.margin_input.text().strip()) if self.margin_checkbox.isChecked() else 0
@@ -275,12 +286,12 @@ class UIManager(QMainWindow):
                                                                         Rectangle(rect.width, rect.height) for rect
                                                                         in
                                                                         self.rectangle_manager.placed_rectangles_list],
-                                                                        allow_flip, margin)
+                                                                        allow_flip, margin, progress_callback)
             else:
                 new_rects = self.algorithm_selector.calculate_placement(algorithm,
                                                                         self.rectangle_manager.placed_rectangles_list,
                                                                         self.rectangle_manager.new_rectangles_list,
-                                                                        allow_flip, margin)
+                                                                        allow_flip, margin, progress_callback)
 
             if new_rects:
                 self.rectangle_manager.placed_rectangles_list = new_rects

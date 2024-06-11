@@ -7,18 +7,21 @@ class AlgorithmSelector:
         self.canvas_width = canvas_width
         self.canvas_height = canvas_height
 
-    def calculate_placement(self, algorithm, placed_rectangles_list, new_rectangles_list, allow_flip, margin):
+    def calculate_placement(self, algorithm, placed_rectangles_list, new_rectangles_list, allow_flip, margin,
+                            progress_callback):
         if algorithm == BL_FILL:
             return pas.bl_fill(self.canvas_width, self.canvas_height, placed_rectangles_list, new_rectangles_list,
-                               allow_flip, margin)
+                               allow_flip, margin, progress_callback)
         elif algorithm == BEST_FIT:
             return pas.best_fit(self.canvas_width, self.canvas_height, placed_rectangles_list, new_rectangles_list,
-                                allow_flip, margin)
+                                allow_flip, margin, progress_callback)
         elif algorithm == ANT_COLONY:
             return pas.ant_colony_optimization(self.canvas_width, self.canvas_height, placed_rectangles_list,
-                                               new_rectangles_list, allow_flip=allow_flip, margin=margin)
+                                               new_rectangles_list, allow_flip=allow_flip, margin=margin,
+                                               progress_callback=progress_callback)
         elif algorithm == LINEAR_PROGRAMMING:
             return pas.solve_packing_problem(self.canvas_width, self.canvas_height, placed_rectangles_list,
-                                             new_rectangles_list, allow_flip, margin)
+                                             new_rectangles_list, allow_flip, margin, progress_callback)
+
         else:
             raise ValueError("Неизвестный алгоритм")
