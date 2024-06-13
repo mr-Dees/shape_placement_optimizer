@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Исправлена ошибка при удалении единственной фигуры.">
+    <list default="true" id="2259bc55-9eca-40bd-8d65-4dae8ff1e130" name="Changes" comment="Исправлена ошибка отсутствия линейного алгоритма при пересчете поля при редактировании и удалении фигуры.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -45,25 +45,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python tests.Python tests in unit_test.py.executor&quot;: &quot;Run&quot;,
-    &quot;Python.AlgorithmSelector.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Canvas.executor&quot;: &quot;Run&quot;,
-    &quot;Python.RectangleManager.executor&quot;: &quot;Run&quot;,
-    &quot;Python.canvas.executor&quot;: &quot;Run&quot;,
-    &quot;Python.config.executor&quot;: &quot;Run&quot;,
-    &quot;Python.constants.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.placement_algorithms.executor&quot;: &quot;Run&quot;,
-    &quot;Python.placement_algorithms_dynamic.executor&quot;: &quot;Run&quot;,
-    &quot;Python.rectangle.executor&quot;: &quot;Run&quot;,
-    &quot;Python.temp.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python tests.Python tests in unit_test.py.executor": "Run",
+    "Python.AlgorithmSelector.executor": "Run",
+    "Python.Canvas.executor": "Run",
+    "Python.RectangleManager.executor": "Run",
+    "Python.canvas.executor": "Run",
+    "Python.config.executor": "Run",
+    "Python.constants.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.placement_algorithms.executor": "Run",
+    "Python.placement_algorithms_dynamic.executor": "Run",
+    "Python.rectangle.executor": "Run",
+    "Python.temp.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "ignore.virus.scanning.warn.message": "true",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -352,7 +352,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718296535642</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="Исправлена ошибка отсутствия линейного алгоритма при пересчете поля при редактировании и удалении фигуры.">
+      <option name="closed" value="true" />
+      <created>1718296809959</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1718296809959</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -367,7 +375,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Изменен дизайн и добавлен выбор размера холста.&#10;Добавлена кнопка изменить размер холста.&#10;Изменен файл с константами." />
     <MESSAGE value="Исправлен баг с пропавшим меню выбора режима." />
     <MESSAGE value="Добавлено поле количество" />
     <MESSAGE value="Добавлена обработка ЛКМ при нажатии на фигуру холста." />
@@ -392,6 +399,7 @@
     <MESSAGE value="Добавлен прогресс выполнения алгоритмов." />
     <MESSAGE value="Добавлены зависимости." />
     <MESSAGE value="Исправлена ошибка при удалении единственной фигуры." />
-    <option name="LAST_COMMIT_MESSAGE" value="Исправлена ошибка при удалении единственной фигуры." />
+    <MESSAGE value="Исправлена ошибка отсутствия линейного алгоритма при пересчете поля при редактировании и удалении фигуры." />
+    <option name="LAST_COMMIT_MESSAGE" value="Исправлена ошибка отсутствия линейного алгоритма при пересчете поля при редактировании и удалении фигуры." />
   </component>
 </project>

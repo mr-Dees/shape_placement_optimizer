@@ -20,8 +20,11 @@ class UIManager(QMainWindow):
 
     def get_canvas_dimensions(self):
         width, ok1 = QInputDialog.getInt(self, "Размер полотна", "Ширина:", DEFAULT_CANVAS_WIDTH, 1, 10000, 1)
+        if not ok1:
+            sys.exit()
+
         height, ok2 = QInputDialog.getInt(self, "Размер полотна", "Высота:", DEFAULT_CANVAS_HEIGHT, 1, 10000, 1)
-        if ok1 and ok2:
+        if ok2:
             return width, height
         else:
             sys.exit()
@@ -337,10 +340,13 @@ class UIManager(QMainWindow):
 
     def resize_canvas(self):
         try:
-            width, ok1 = QInputDialog.getInt(self, "Изменить размер полотна", "Ширина:", self.canvas_width, 1, 10000, 1)
-            height, ok2 = QInputDialog.getInt(self, "Изменить размер полотна", "Высота:", self.canvas_height, 1, 10000,
-                                              1)
-            if ok1 and ok2:
+            width, ok1 = QInputDialog.getInt(self, "Изменить размер полотна", "Ширина:",
+                                             self.canvas_width, 1, 10000, 1)
+            if not ok1:
+                return
+            height, ok2 = QInputDialog.getInt(self, "Изменить размер полотна", "Высота:",
+                                              self.canvas_height, 1, 10000, 1)
+            if ok2:
                 confirm = QMessageBox.question(self, "Подтверждение изменения размера",
                                                "Все данные будут очищены. Вы уверены?",
                                                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
@@ -472,9 +478,11 @@ class UIManager(QMainWindow):
         width, height = rect.width, rect.height
         try:
             new_width, ok1 = QInputDialog.getInt(self, "Изменить ширину", "Ширина:", width, 1, 10000, 1)
-            new_height, ok2 = QInputDialog.getInt(self, "Изменить высоту", "Высота:", height, 1, 10000, 1)
+            if not ok1:
+                return
 
-            if ok1 and ok2:
+            new_height, ok2 = QInputDialog.getInt(self, "Изменить высоту", "Высота:", height, 1, 10000, 1)
+            if ok2:
                 algorithm, ok3 = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:",
                                                       [BL_FILL, BEST_FIT, ANT_COLONY, LINEAR_PROGRAMMING], 0, False)
                 if ok3:
