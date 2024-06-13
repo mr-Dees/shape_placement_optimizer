@@ -283,9 +283,9 @@ class UIManager(QMainWindow):
             if placement_mode == QMessageBox.StandardButton.Yes:
                 new_rects = self.algorithm_selector.calculate_placement(algorithm, [],
                                                                         self.rectangle_manager.new_rectangles_list + [
-                                                                        Rectangle(rect.width, rect.height) for rect
-                                                                        in
-                                                                        self.rectangle_manager.placed_rectangles_list],
+                                                                            Rectangle(rect.width, rect.height) for rect
+                                                                            in
+                                                                            self.rectangle_manager.placed_rectangles_list],
                                                                         allow_flip, margin, progress_callback)
             else:
                 new_rects = self.algorithm_selector.calculate_placement(algorithm,
@@ -511,7 +511,6 @@ class UIManager(QMainWindow):
                 return
 
         width, height = rect.width, rect.height
-
         recalculate_choice = QMessageBox.question(self, "Выбор режима удаления",
                                                   "Нажмите Yes для удаления с перерасчетом всех размещенных фигур\n"
                                                   "Или No для удаления без перерасчета.",
@@ -523,25 +522,24 @@ class UIManager(QMainWindow):
                                                  0, False)
             if ok:
                 confirm = QMessageBox.question(self, "Подтверждение удаления",
-                                               f"Вы хотите удалить прямоугольник {width}x{height} "
+                                               f"Вы хотите удалить прямоугольник {width}x{height} " 
                                                f"с пересчетом всех размещенных фигур?",
                                                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-
                 if confirm == QMessageBox.StandardButton.Yes:
                     self.rectangle_manager.delete_rectangle(rect, self.placed_rectangles_list_widget)
-                    self.calculate_placement(placement_mode=QMessageBox.StandardButton.Yes)
-
+                    if self.rectangle_manager.placed_rectangles_list:  # Проверка на наличие фигур
+                        self.calculate_placement(placement_mode=QMessageBox.StandardButton.Yes)
+                    else:   # Обновление холста с пустым списком фигур
+                        self.canvas.update_canvas([], 0, None)
         elif recalculate_choice == QMessageBox.StandardButton.No:
             confirm = QMessageBox.question(self, "Подтверждение удаления",
                                            f"Вы хотите удалить прямоугольник {width}x{height} "
                                            f"без пересчета всех размещенных фигур?",
                                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-
             if confirm == QMessageBox.StandardButton.Yes:
                 self.rectangle_manager.delete_rectangle(rect, self.placed_rectangles_list_widget)
                 self.canvas.update_canvas(self.rectangle_manager.placed_rectangles_list,
-                                          int(self.margin_input.text().strip())
-                                          if self.margin_checkbox.isChecked() else 0,
+                                          int(self.margin_input.text().strip()) if self.margin_checkbox.isChecked() else 0,
                                           self.canvas.highlighted_rect)
 
 
