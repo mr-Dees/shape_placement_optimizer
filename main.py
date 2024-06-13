@@ -476,7 +476,7 @@ class UIManager(QMainWindow):
 
             if ok1 and ok2:
                 algorithm, ok3 = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:",
-                                                      [BL_FILL, BEST_FIT, ANT_COLONY], 0, False)
+                                                      [BL_FILL, BEST_FIT, ANT_COLONY, LINEAR_PROGRAMMING], 0, False)
                 if ok3:
                     confirm = QMessageBox.question(self, "Подтверждение изменений",
                                                    f"Изменить прямоугольник на {new_width}x{new_height} "
@@ -518,8 +518,8 @@ class UIManager(QMainWindow):
                                                   defaultButton=QMessageBox.StandardButton.Yes)
 
         if recalculate_choice == QMessageBox.StandardButton.Yes:
-            algorithm, ok = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:", [BL_FILL, BEST_FIT, ANT_COLONY],
-                                                 0, False)
+            algorithm, ok = QInputDialog.getItem(self, "Выбор алгоритма", "Алгоритм:",
+                                                 [BL_FILL, BEST_FIT, ANT_COLONY, LINEAR_PROGRAMMING], 0, False)
             if ok:
                 confirm = QMessageBox.question(self, "Подтверждение удаления",
                                                f"Вы хотите удалить прямоугольник {width}x{height} " 
